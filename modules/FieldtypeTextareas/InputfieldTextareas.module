@@ -1,0 +1,374 @@
+<?php namespace ProcessWire;
+
+/**
+ * ProcessWire Textareas Inputfield
+ *
+ * Stores multiple text/textarea fields. 
+ *
+ * Part of the ProFields package.
+ * Please do not distribute. 
+ * 
+ * Copyright (C) 2017 by Ryan Cramer 
+ *
+ * http://processwire.com
+ *
+ * @todo add a setLabel() method
+ * 
+ * @property int $inputWidth
+ * @property int $collapsed2
+ * @property int $multilang
+ *
+ */
+
+class InputfieldTextareas extends Inputfield {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => __('ProFields: Textareas', __FILE__), 
+			'summary' => __('Multiple text/textarea fields combined into one field.', __FILE__), 
+			'version' => 7,
+			'requires' => 'FieldtypeTextareas'
+			);
+	}
+
+	/**
+	 * Current page being edited
+	 * 
+	 * @var Page
+	 *
+	 */
+	protected $page = null;
+
+	/**
+	 * Current field for this Textareas
+	 * 
+	 * @var Field
+	 *
+	 */
+	protected $field = null;
+
+	/**
+	 * Cached result from getInputfields()
+	 * 
+	 * @var InputfieldWrapper
+	 *
+	 */
+	protected $inputfields = null;
+
+	/**
+	 * Construct the Inputfield and establish default config values
+	 *
+	 */
+	public function __construct() {
+		$this->set('inputWidth', 0); 
+		$this->set('collapsed2', 0); 
+		$this->set('multilang', 0); 
+		parent::__construct();
+	}
+
+	/**
+	 * Capture setting of the inputWidth property to validate it within a range
+	 * 
+	 * @param string $key
+	 * @param mixed $value
+	 * @return $this
+	 *
+	 */
+	public function set($key, $value) {
+		if($key == 'inputWidth') {		
+			$value = (int) $value;
+			if($value > 100) $value = 100; 
+			if($value < 10) $value = 0;
+		}
+		return parent::set($key, $value); 
+	}
+
+	/**
+	 * Set the current Field object
+	 * 
+	 * @param Field $field
+	 *
+	 */
+	public function setField(Field $field) {
+		$this->field = $field; 
+	}
+
+	/**
+	 * Set the current Page (being edited) object
+	 * 
+	 * @param Page $page
+	 *
+	 */
+	public function setPage(Page $page) {
+		$this->page = $page; 
+	}
+
+	/**
+	 * Get the Textareas Inputfields
+	 *
+	 * @return InputfieldWrapper
+	 *
+	 */
+	protected function getInputfields() {
+
+		if(!is_null($this->inputfields)) return $this->inputfields; 
+		$inputWidth = $this->inputWidth; 
+		/** @var FieldtypeTextareas $type */
+		$type = $this->field->type;
+		$valueType = $type->getValueType($this->field, 'type');
+		$fieldtype = $type->getFieldtype($this->field); 
+
+		$fieldset = $this->wire('modules')->get('InputfieldFieldset'); 
+		$fieldset->attr('name', $this->name); 
+		$fieldset->label = $this->label;
+		$fieldset->collapsed = $this->collapsed; 
+		$attrs = $this->getAttributes();
+
+		foreach($attrs as $k => $v) {
+			if($k == 'value') continue; 
+			$fieldset->attr($k, $v); 
+		}
+
+		unset($attrs['type'], $attrs['name'], $attrs['id'], $attrs['value']); 
+
+		$languages = $this->field->get('multilang') && $this->wire('languages') ? $this->wire('languages') : null;
+		$definitions = $type->getTextareaDefinitions($this->field); 
+		$names = array_keys($definitions);
+
+		foreach($definitions as $name => $definition) {
+
+			list($label, $description, $width, $notes, $required, $conditions, $showIf, $requiredIf) = $definition;
+			
+			if(strlen($conditions) && $this->page && !$this->page->matches($conditions)) {
+				// page being edited does not match required conditions
+				continue;
+			}
+			
+			if(strlen($requiredIf)) $required = true;
+		
+			/** @var Inputfield $inputfield */
+			$inputfield = $this->modules->get($this->field->get('inputfieldClass')); 
+
+			foreach($this->field->getArray() as $key => $value) {
+				if($key == 'options') {
+					// skip over static 'options' value since it is not applicable to Page fields
+					if($fieldtype instanceof FieldtypePage || $valueType == 'Page' || $valueType == 'PageArray') continue; 
+				}
+				if($inputfield->has($key)) $inputfield->set($key, $value); 
+			}
+
+			$inputfield->attr('name', $this->attr('name') . "__" . $name); 	
+			$inputfield->attr('data-name', $name); 
+			if($inputfield->className() == 'InputfieldCheckbox') {
+				if($this->attr('value')->$name) $inputfield->attr('checked', 'checked'); 
+			} else if(is_object($this->attr('value'))) {
+				$inputfield->attr('value', $this->attr('value')->$name); 
+			}
+			$inputfield->label = $label;
+			$inputfield->description = $description;
+			$inputfield->notes = $notes; 
+			$inputfield->collapsed = $this->collapsed2; 
+			$inputfield->required = $required; 
+			
+			if(strlen($requiredIf)) {
+				$inputfield->requiredIf = $this->updateDependencyStr($names, $requiredIf);
+			}
+			if(strlen($showIf)) {
+				$inputfield->showIf = $this->updateDependencyStr($names, $showIf);
+			}
+
+			if($width) $inputfield->columnWidth = $width; 
+				else if($inputWidth) $inputfield->columnWidth = $inputWidth; 
+
+			if($languages && is_object($this->attr('value'))) {
+				$inputfield->useLanguages = true; 
+				foreach($languages as $language) {
+					if($language->isDefault()) continue; 
+					$inputfield->set("value$language", $this->attr('value')->get("{$name}___$language")); 
+				}
+			}
+
+			foreach($attrs as $key => $value) {
+				$inputfield->attr($key, $value); 
+			}
+
+			$inputfield->resetTrackChanges(true); 
+			$fieldset->add($inputfield); 
+			
+		}
+
+		$this->inputfields = $fieldset; 
+
+		return $fieldset; 
+	}
+
+	/**
+	 * Update a showIf or requiredIf dependency to account for actual textareas field names
+	 * 
+	 * @param array $fieldNames
+	 * @param string $str
+	 * @return string
+	 * 
+	 */
+	protected function updateDependencyStr(array $fieldNames, $str) {
+		foreach($fieldNames as $fieldName) {
+			if(strpos($str, $fieldName) === false) continue;
+			$str = preg_replace('/(,|\s,\||^)' . $fieldName . '([-=!%*~|])/', '$1' . $this->attr('name') . "__$fieldName$2", $str);
+		}
+		return $str;
+	}
+
+	/**
+	 * Is this Textareas Inputfield empty?
+	 *
+	 * @return bool
+	 *
+	 */
+	public function isEmpty() {
+		$value = $this->attr('value'); 
+		if(empty($value)) return true; 
+		$length = 0; 
+		foreach($value as $k => $v) {
+			$length += strlen($v);
+		}
+		return $length === 0; 
+	}
+	
+	public function renderReady(Inputfield $parent = null, $renderValueMode = false) {
+		$this->addClass('InputfieldNoFocus', 'wrapClass');
+		if($this->field && $this->field->type instanceof FieldtypeTextareas) {
+			$inputfields = $this->getInputfields();
+			foreach($inputfields as $inputfield) {
+				$inputfield->renderReady();
+			}
+		}
+		return parent::renderReady($parent, $renderValueMode);
+	}
+
+	/**
+	 * Render the Inputfield markup
+	 *
+	 * @return string
+	 *
+	 */
+	public function ___render() {
+
+		if(!$this->field || !$this->field->type instanceof FieldtypeTextareas) {
+			$error = "Field '{$this->field->name}' - Fieldtype {$this->field->type} is not compatible with Textareas.";
+			$this->error($error);
+			return $error; 
+		}
+
+		$inputfields = $this->getInputfields();
+
+		return $inputfields->render();
+	}
+
+	/**
+	 * Render just the value (not input) in text/markup for presentation purposes
+	 *
+	 * @return string of text or markup where applicable
+	 *
+	 */
+	public function ___renderValue() {
+		$inputfields = $this->getInputfields();
+		return $inputfields->renderValue();
+	}
+
+	/**
+	 * Process the Textareas input
+	 * 
+	 * @param WireInputData $input
+	 * @return $this
+	 *
+	 */
+	public function ___processInput(WireInputData $input) {
+		$inputfields = $this->getInputfields();
+		$languages = $this->field->get('multilang') && $this->wire('languages') ? $this->wire('languages') : null;
+		foreach($inputfields as $f) {
+			$f->processInput($input); 
+			if($f->isChanged()) {
+				$name = $f->attr('data-name'); 
+				$value = $f->attr('value'); 
+				$this->value->set($name, $value); 
+				if($languages) foreach($languages as $language) {
+					$this->value->set("{$name}___$language", $f->get("value$language")); 
+				}
+				$this->trackChange('value');
+			}
+			if($f->getSetting('required') && $f->isEmpty()) {
+				$f->error($this->_('A value is required here'));
+			}
+		}	
+		return $this;
+	}
+
+	/**
+	 * Get the Inputfields necessary to configure this field (for the Input tab) 
+	 *
+	 * @return InputfieldWrapper
+	 *
+	 */
+	public function ___getConfigInputfields() {
+
+		$inputfieldClass = $this->field->get('inputfieldClass'); 
+		if(!$inputfieldClass) $inputfieldClass = 'InputfieldTextarea';
+		/** @var Inputfield $inputfield */
+		$inputfield = $this->modules->get($inputfieldClass); 
+		$inputfield->set('hasFieldtype', false);
+		$inputfield->attr('name', $this->attr('name')); 
+
+		foreach($this->field->getArray() as $key => $value) {
+			if($inputfield->has($key)) {
+				$inputfield->set($key, $value); 
+			} 
+		}
+	
+		$moduleInfo = $this->wire('modules')->getModuleInfoVerbose($inputfield); 
+		$inputfields = parent::___getConfigInputfields();
+		$fieldset = $this->wire('modules')->get('InputfieldFieldset');
+		$fieldset->label = $moduleInfo['title'];
+		$fieldset->description = $moduleInfo['summary'];
+		$n = 0;
+		foreach($inputfield->getConfigInputfields() as $in) {
+			if($inputfields->getChildByName($in->name)) continue; 
+			$fieldset->add($in); 
+			$n++;
+		}
+		if($n) $inputfields->add($fieldset); 
+
+		// $inputfields = $inputfield->getConfigInputfields();
+
+		// account for bug in pre 2.5.22 versions where InputfieldSelect config didn't set value attribute
+		$options = $this->field->get('options');
+		if($options && $in = $inputfields->getChildByName('options')) {
+			$in->attr('value', $options); 
+		}
+
+		$fieldset = $this->wire('modules')->get('InputfieldFieldset'); 
+		$fieldset->label = $this->_('Textareas Input Settings'); 
+
+		$f = $this->wire('modules')->get('InputfieldInteger'); 
+		$f->attr('name', 'inputWidth'); 
+		$f->label = $this->_('Column Width %'); 
+		$f->description = $this->_('Enter the default width for each Textareas item as a percentage between 10 and 100. Values less than 10 are assumed to be 100% (default).');
+		$f->description .= $this->_('This width can optionally be overridden in your textarea definitions, so this serves as a default.'); 
+		$f->min = 0;
+		$f->max = 100; 
+		$f->attr('value', (int) $this->inputWidth); 
+		$f->columnWidth = 50; 
+		$fieldset->add($f); 
+
+		$f = $inputfields->getChildByName('collapsed'); 
+		$f = clone $f; 
+		$f->attr('name', 'collapsed2'); 
+		$f->attr('value', (int) $this->collapsed2); 
+		$f->columnWidth = 50; 
+		$f->description = $this->_('How should the individual fields within the Textareas be displayed in the page editor?'); 
+		$fieldset->add($f); 
+
+		$inputfields->add($fieldset);
+
+		return $inputfields; 
+	}
+}

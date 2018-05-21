@@ -1,0 +1,1278 @@
+<?php namespace ProcessWire;
+
+/**
+ * ProcessWire Textareas Fieldtype
+ *
+ * Stores multiple text/textarea fields. 
+ *
+ * Part of the ProFields package.
+ * Please do not distribute. 
+ * 
+ * Copyright (C) 2017 by Ryan Cramer 
+ *
+ * https://processwire.com
+ * 
+ * @property array $allowTypes
+ * @property array $disallowTypes
+ * 
+ */
+
+class FieldtypeTextareas extends FieldtypeTextarea implements ConfigurableModule {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => __('ProFields: Textareas', __FILE__),
+			'version' => 8,
+			'summary' => __('Multiple text/textarea fields combined into one field.', __FILE__),
+			'installs' => 'InputfieldTextareas',
+			);
+	}
+
+	const multilangNo = 0;
+	const multilangYes = 1; 
+	const multilangInherit = 2;  // multilang on and inherit values from default when blank
+
+	/**
+	 * Definitions for Textareas fields cached so we don't have to parse them multiple times
+	 *
+	 */ 
+	protected $definitionCache = array();
+	protected $definitionCacheLanguages = array();
+
+	/**
+	 * Default allowed base classes for Inputfields used by textareas
+	 *
+	 */
+	static protected $defaultAllowTypes = array(
+		'InputfieldText', 
+		'InputfieldInteger',
+		'InputfieldDatetime'
+		);
+
+	/**
+	 * Default disallowed base classes for Inputfields used by textareas
+	 *
+	 */
+	static protected $defaultDisallowTypes = array(
+		'InputfieldPassword',
+		'InputfieldPageTitle',
+		'InputfieldPageName', 
+		'InputfieldSubmit',
+		'InputfieldRepeater',
+		'InputfieldWrapper',
+		'InputfieldTextareas',
+		'InputfieldMultiplier',
+		'InputfieldTable',
+		'InputfieldPageTable',
+		'InputfieldFile',
+		'InputfieldHidden', 
+		'InputfieldCommentsAdmin',
+		// the following are still allowed when used with the Page type
+		'InputfieldPageListSelect',
+		'InputfieldPageListSelectMultiple', 
+		'InputfieldPageAutocomplete', 
+		);
+
+	/**
+	 * Construct and init default config
+	 *
+	 */
+	public function __construct() {
+
+		$dir = dirname(__FILE__); 
+		require_once($dir . "/TextareasData.php"); 
+
+		// allowed base classes for textareas
+		// assumes all classes that descend from any of these
+		$this->set('allowTypes', self::$defaultAllowTypes); 
+
+		// disallowed for textareas
+		$this->set('disallowTypes', self::$defaultDisallowTypes);
+	}
+
+	/**
+	 * Get a blank Textareas value
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @return TextareasData
+	 *
+	 */
+	public function getBlankValue(Page $page, Field $field) {
+
+		$value = new TextareasData();
+		$value->setField($field); 
+		$definitions = $this->getTextareaDefinitions($field); 
+		$languages = $field->get('multilang') ? $this->wire('languages') : null;	
+		$valueType = $this->getValueType($field);
+		$type = $valueType['type'];
+		$fieldtype = $this->getFieldtype($field); 
+
+		foreach($definitions as $name => $definition) {
+			// establish blank values
+			
+			$conditions = isset($definition[5]) ? $definition[5] : '';
+			if(strlen($conditions) && !$page->matches($conditions)) continue;
+			
+			if($fieldtype) {
+				$blank = $fieldtype->getBlankValue($page, $field); 
+			} else if($type == 'Array') {
+				$blank = array();
+			} else if($type == 'PageArray') {
+				$blank = new PageArray();
+			} else if($type == 'Page') {
+				$blank = new NullPage();
+			} else {
+				$blank = '';
+			}
+			$value->set($name, $blank);
+
+			if($languages) foreach($languages as $language) {
+				if($language->isDefault()) continue; 
+				$value->setLanguageValue($language, $name, $blank); 
+			}
+		}
+		return $value; 
+	}
+
+	/**
+	 * Sanitize a Textareas value for placement in a Page
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param TextareasData $value
+	 * @return TextareasData
+	 *
+	 */
+	public function sanitizeValue(Page $page, Field $field, $value) {
+
+		if(!$value instanceof TextareasData) $value = $this->getBlankValue($page, $field); 	
+		$valueType = $this->getValueType($field); 
+		$type = $valueType['type'];
+		$fieldtype = $this->getFieldtype($field); 
+		
+		foreach($value as $k => $v) {
+			
+			if($fieldtype) {
+				// Fieldtype available for the type, so we delegate to its sanitizeValue
+				if($fieldtype == 'FieldtypePage' && !$field->get('derefAsPage') && $v instanceof Page) {
+					// avoid passing a Page to FieldtypePage::sanitizeValue when derefAsPage is false
+					// as this prevents a fatal error when FieldtypePage attempts to retrieve the value
+					// directly from the $page object and gets something it doesn't expect. 
+					$a = new PageArray();
+					$a->add($v); 
+					$v = $a; 
+				}
+				$value->set($k, $fieldtype->sanitizeValue($page, $field, $v));
+
+			} else if($type == 'Array') {
+				if(!is_array($v)) {
+					$v = $v ? array($v) : array();
+				}
+				$value->set($k, $v); 
+
+			} else if($type == 'Page' || $type == 'PageArray') {
+				// Page or PageArray
+				// Only used when a Page Inputfield type that doesn't have a related Fieldtype class
+				// @todo Do any current exist, or can this entire statement be removed?
+				if($v) {
+					if($v instanceof Page) {
+						if($type == 'PageArray') {
+							$a = new PageArray();
+							$a->add($v);
+							$v = $a; 
+						}
+					} else if($v instanceof PageArray) {
+						// ok
+
+					} else if((is_string($v) || is_int($v)) && ctype_digit(str_replace('|', '', $v))) {
+						$v = $this->wire('pages')->getById(explode('|', $v)); 
+					}
+					if($type == 'Page' && $v instanceof PageArray) {
+						$v = ($v && count($v)) ? $v->first() : new NullPage();
+					}
+						
+				} else if($type == 'Page') {
+					$v = new NullPage();
+				} else if($type == 'PageArray') {
+					$v = new PageArray();
+				}
+
+				$value->set($k, $v); 
+				
+			} else {
+				// string
+				$value->set($k, parent::sanitizeValue($page, $field, $v)); 
+			}
+		}
+		return $value; 
+	}
+	
+	/**
+	 * Format a Textareas value for output
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param TextareasData $value
+	 * @return TextareasData
+	 * @throws WireException when given a non TextareasData value
+	 *
+	 */
+	public function ___formatValue(Page $page, Field $field, $value) {
+
+		if(!$value instanceof TextareasData) throw new WireException("formatValue requires TextareasData value"); 
+
+		$formattedValue = new TextareasData();
+		$formattedValue->setField($field);
+		$fieldtype = $this->getFieldtype($field); 
+		$valueType = $this->getValueType($field); 
+		$type = $valueType['type'];
+
+		$language = null;
+		$multilang = $field->get('multilang');
+		
+		if($multilang) {
+			$language = $this->wire('user')->language; 
+			if($language && $language->isDefault()) $language = null;
+		} 
+
+		foreach($value as $k => $v) {
+			if(strpos($k, '___')) continue; // skip over language values
+			if($language) {
+				$_v = $value->getLanguageValue($language, $k); 
+				if(empty($_v) && $multilang == self::multilangInherit) {
+					// use $v
+				} else {
+					$v = $_v; 
+				}
+			}
+			
+			if($fieldtype) {
+				$formattedValue->set($k, $fieldtype->formatValue($page, $field, $v)); 
+				
+			} else if($type == 'Text' || $type == 'Textarea') {
+				$formattedValue->set($k, parent::___formatValue($page, $field, $v)); 
+				
+			} else {
+				// avoid applying additional formatting to non-text types
+				$formattedValue->set($k, $v); 
+			}
+		}
+
+		return $formattedValue; 
+	}
+
+	/**
+	 * Prepare a Textareas value for saving (converts to CR delimited string)
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param TextareasData $value
+	 * @return string
+	 *
+	 */
+	public function ___sleepValue(Page $page, Field $field, $value) {
+
+		$sleepValue = '';
+		$valueType = $this->getValueType($field); 
+		$type = $valueType['type'];
+		$fieldtype = $this->getFieldtype($field);
+		$definitions = $this->getTextareaDefinitions($field);
+
+		foreach($value as $name => $v) {
+		
+			if(!isset($definitions[$name])) {
+				// check if values for deleted definitions are present
+				$remove = true;
+				if(strpos($name, '___') !== false) {
+					// multi-language property, i.e. "property___1234"
+					list($_name,) = explode('___', $name, 2);
+					if(strlen($_name) && isset($definitions[$_name])) $remove = false;
+				}
+				if($remove) {
+					$this->warning(
+						"Removing unknown textareas property '$name' for field '$field->name' on page $page->path", 
+						Notice::debug
+					);
+					continue; 
+				}
+			}
+		
+			if($fieldtype) {
+				try {
+					$v = $fieldtype->sleepValue($page, $field, $v);
+				} catch(\Exception $e) {
+					$this->warning($e->getMessage()); 
+					continue; 
+				}
+
+			} else if($type == 'Page' || $type == 'PageArray') {
+				// @todo can this be removed?
+				if($v instanceof Page) {
+					$v = $v->id ? (string) $v : ''; // i.e. 123
+				} else {
+					$v = (string) $v; // i.e. 123|456|789
+				}
+			}
+			
+			if(is_array($v)) $v = json_encode($v); 
+
+			// remove carriage return characters, leaving only \n linefeed characters
+			$v = parent::___sleepValue($page, $field, $v); 
+			$v = trim($v); 
+			if(!strlen($v)) continue; 
+			$v = str_replace(array("\r\n", "\r"), array("\n", ""), $v); 
+			$sleepValue .= "\r$name:$v";
+		}
+
+		return ltrim($sleepValue);
+	}
+
+	/**
+	 * Convert a textareas value from string to TextareasData
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param string $value
+	 * @return TextareasData
+	 *
+	 */
+	public function ___wakeupValue(Page $page, Field $field, $value) {
+
+		$wakeupValue = $this->getBlankValue($page, $field); 
+		$valueType = $this->getValueType($field);
+		$type = $valueType['type'];
+		$fieldtype = $this->getFieldtype($field); 
+
+		// split fields by CR
+		foreach(explode("\r", $value) as $v) {
+			// isolate name from rest by colon
+			if(empty($v) || !strpos($v, ':')) continue; 
+			list($name, $v) = explode(":", $v, 2); 
+		
+			if($fieldtype) {
+				// the input type has a dedicated fieldtype that can be used to wakeup the value
+				
+				// see if this should be extracted to array first
+				$v = trim($v);
+				$c1 = substr($v, 0, 1); 
+				if($c1 == '[' || $c1 == '{') {
+					$c2 = substr($v, -1);
+					if(($c1 == '[' && $c2 == ']') || ($c1 == '{' && $c2 == '}')) {
+						$test = json_decode($v, true);
+						if(is_array($test)) $v = $test;
+						unset($test);
+					}
+					if(is_array($v) && !in_array($type, array('Array', 'Page', 'PageArray'))) $v = reset($v);
+				} else if($type == 'Array') {
+					$v = array($v);
+				}
+
+				// let the fieldtype wakeup the value
+				$v = $fieldtype->wakeupValue($page, $field, $v); 
+
+			} else if($type == 'Page' || $type == 'PageArray') {
+				// @todo: can this be removed?
+				if($v) {
+					// populated page value
+					$v = $this->wire('pages')->getById(explode('|', $v)); 
+					if($type == 'Page') $v = count($v) ? $v->first() : new NullPage(); // single page
+				} else if($type == 'PageArray') {
+					// blank page array
+					$v = new PageArray();
+				} else {
+					// blank page
+					$v = new NullPage();
+				}
+			} else if($type == 'Array' || is_array($v)) {
+				if($v && in_array(substr($v, 0, 1), array('[', '{'))) {
+					$v = json_decode($v, true); 
+				} else if(strlen($v)) {
+					$v = array($v);
+				} else {
+					$v = array();
+				}
+			}
+		
+			if(!$fieldtype && ($type == 'Text' || $type == 'Textarea')) {
+				$wakeupValue->set($name, parent::___wakeupValue($page, $field, $v)); 
+			} else {
+				$wakeupValue->set($name, $v); 
+			}
+		}
+
+		$wakeupValue->resetTrackChanges(true);
+
+		return $wakeupValue; 
+	}
+	
+	/**
+	 * Prepare a Textareas value for export
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param TextareasData $value
+	 * @param array $options
+	 * @return array
+	 *
+	 */
+	public function ___exportValue(Page $page, Field $field, $value, array $options = array()) {
+		
+		if($field->get('multilang') && $this->wire('languages')) {
+			$languages = array(); 
+			foreach($this->wire('languages') as $language) {
+				$languages[$language->id] = $language->name;
+			}
+		} else {
+			$languages = null;
+		}
+
+		$fieldtype = $this->getFieldtype($field); 
+		$a = array();
+		
+		foreach($value as $name => $v) {
+			if(empty($v) && !empty($options['human'])) continue; // exclude blank values
+			if($fieldtype) $v = $fieldtype->exportValue($page, $field, $v, $options); 
+			if(strpos($name, '___') && $languages) {
+				list($_name, $languageID) = explode('___', $name, 2); 
+				$languageID = (int) $languageID; 
+				if(isset($languages[$languageID])) $name = $_name . '___' . $languages[$languageID];
+			}
+			$a[$name] = $v; 
+		}
+	
+		return $a; 
+	}
+	
+	/**
+	 * Prepare a Textareas value for import
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @param array $value
+	 * @param array $options
+	 * @return TextareasData
+	 *
+	 */
+	public function ___importValue(Page $page, Field $field, $value, array $options = array()) {
+		if($field->get('multilang') && $this->wire('languages')) {
+			$languages = array();
+			foreach($this->wire('languages') as $language) {
+				$languages[$language->name] = $language->id; 
+			}
+		} else {
+			$languages = null;
+		}
+		$fieldtype = $this->getFieldtype($field);
+		$newValue = $this->getBlankValue($page, $field); 
+		foreach($value as $name => $v) {
+			if($fieldtype) $v = $fieldtype->importValue($page, $field, $v, $options);
+			if(strpos($name, '___') && $languages) {
+				list($_name, $languageName) = explode('___', $name, 2); 
+				if(isset($languages[$languageName])) {
+					$newValue->setLanguageValue($languages[$languageName], $_name, $v);
+					continue;
+				}
+			}
+			$newValue->set($name, $v);
+		}
+		return $newValue;
+	}
+
+	/**
+	 * Get the Inputfield needed to populate a Textareas value
+	 *
+	 * @param Page $page
+	 * @param Field $field
+	 * @return InputfieldTextareas
+	 *
+	 */
+	public function getInputfield(Page $page, Field $field) {
+		/** @var InputfieldTextareas $inputfield */
+		$inputfield = $this->modules->get('InputfieldTextareas'); 
+		$inputfield->setField($field); 
+		$inputfield->setPage($page); 
+		return $inputfield; 
+	}
+
+	/**
+	 * Get the DB schema necessary to store a Textareas value
+	 *
+	 * @param Field $field
+	 * @return array
+	 *
+	 */
+	public function getDatabaseSchema(Field $field) {
+		$schema = parent::getDatabaseSchema($field); 
+		return $schema;
+	}
+
+	/**
+	 * Get the label (text) for a Textareas property
+	 *
+	 * @param Field|string|int $field
+	 * @param string $name Property
+	 * @param Language|null Optionally specify a language 
+	 * @return string Returns label or blank string if not found
+	 *
+	 */
+	public function getLabel($field, $name, $language = null) {
+		return $this->getLabelType($field, $name, 0, $language); 
+	}
+
+	/**
+	 * Get the description (text) for a Textareas property
+	 *
+	 * @param Field|string|int $field
+	 * @param string $name Property
+	 * @param Language|null Optionally specify a language 
+	 * @return string Returns description or blank string if not found
+	 *
+	 */
+	public function getDescription($field, $name, $language = null) {
+		return $this->getLabelType($field, $name, 1, $language); 
+	}
+
+	/**
+	 * Get the width percentage (int) for a Textareas property, or 0 if not defined
+	 *
+	 * @param Field|string|int $field
+	 * @param string $name Property
+	 * @param Language|null Optionally specify a language 
+	 * @return int 
+	 *
+	 */
+	public function getWidth($field, $name, $language = null) {
+		return $this->getLabelType($field, $name, 2, $language); 
+	}
+	
+	/**
+	 * Get the notes (text) for a Textareas property
+	 *
+	 * @param Field|string|int $field
+	 * @param string $name Property
+	 * @param Language|null Optionally specify a language
+	 * @return string Returns notes or blank string if not found
+	 *
+	 */
+	public function getNotes($field, $name, $language = null) {
+		return $this->getLabelType($field, $name, 3, $language);
+	}
+
+	/**
+	 * Get a value for a Textareas property
+	 *
+	 * @param Field|string|int $field
+	 * @param string $name Name of textareas property
+	 * @param int $type Specify 0 for label, 1 for description, 2 for width or 3 for notes
+	 * @param Language|null Optionally specify a language 
+	 * @return string Returns label or blank string if not found
+	 *
+	 */
+	protected function getLabelType($field, $name, $type, $language = null) {
+		if(!is_object($field)) $field = $this->wire('fields')->get($field); 
+		if(!$field) return '';
+		$schema = $this->getTextareaDefinitions($field, true, $language); 
+		if(!isset($schema[$name])) return '';
+		if(!isset($schema[$name][$type])) return '';
+		return $schema[$name][$type]; 
+	}
+
+	/**
+	 * Get the definitions (array) for a particular Textareas field
+	 *
+	 * @param Field $field
+	 * @param bool $cache Whether or not to allow use of the definition cache
+	 * @param Page|null Language to retrieve in (null=auto-detect)
+	 * @return array
+	 *
+	 */
+	public function getTextareaDefinitions(Field $field, $cache = true, Page $language = null) {
+
+		if(is_null($language)) {
+			$languages = $this->wire('languages'); 
+			$language = $languages ? $this->wire('user')->language : null;
+			if($language && $language->isDefault()) $language = null;
+		}
+
+		if($cache && isset($this->definitionCache[$field->name])) {
+			$schema = $this->definitionCache[$field->name]; 
+		} else {
+			$schema = $this->extractDefinitions($field->get('definitions')); 
+			if($cache && count($schema)) $this->definitionCache[$field->name] = $schema; 
+		}
+
+		if(!$language) return $schema; 
+
+		if($cache && isset($this->definitionCacheLanguages[$field->name][$language->id])) {
+			return $this->definitionCacheLanguages[$field->name][$language->id]; 
+		}
+
+		$name = "definitions$language";
+		$definitions = $field->$name; 
+		if(!$definitions) return $schema; // if no language settings, return regular schema
+		$schemaLanguage = $this->extractDefinitions($definitions); 
+
+		foreach($schema as $name => $a) {
+
+			// overwrite label (0), description (1), and notes (3) values with language values in $schema, when present
+			// otherwise inherit the values already in $schema
+
+			if(!isset($schemaLanguage[$name])) continue; 
+			list($label, $description, $width, $notes, $required, $conditions) = $schemaLanguage[$name]; 
+			if($conditions) {}
+			if($label) $schema[$name][0] = $label;
+			if($width) $schema[$name][2] = $width; 
+
+			if($description) {
+				// translated description
+				$schema[$name][1] = $description;
+
+			} else if($label) {
+				// avoid inherit description from default when a translated label is in use
+				$schema[$name][1] = ''; 
+			}
+			
+			if($notes) {
+				// translated description
+				$schema[$name][3] = $notes;
+
+			} else if($label) {
+				// avoid inherit notes from default when a translated label is in use
+				$schema[$name][3] = '';
+			}
+	
+			if($required) {
+				$schema[$name][4] = true;
+			} else {
+				$schema[$name][4] = false;
+			}
+		}
+		
+		if($cache && count($schema)) $this->definitionCacheLanguages[$field->name][$language->id] = $schema; 
+
+		return $schema; 
+		
+	}
+
+	/**
+	 * Given a line-separated string of textarea definitions, convert to array 
+	 * 
+	 * Array in format field_name => array(
+	 *   0 => string label, 
+	 *   1 => string description, 
+	 *   2 => int width, 
+	 *   3 => string notes,
+	 *   4 => bool required, 
+	 *   5 => string if() conditions, 
+	 *   6 => string showIf() conditions
+	 *   7 => string requiredIf() conditions
+	 * );
+	 *
+	 * @param string $definitions	
+	 * @return array
+	 *
+	 */
+	protected function extractDefinitions($definitions) {
+
+		$lines = explode("\n", $definitions); 
+		$schema = array();
+
+		foreach($lines as $line) {
+			$line = trim($line); 
+			if(empty($line)) continue; 
+			$required = false;
+			$conditions = '';
+			$showIf = '';
+			$requiredIf = '';
+			$pos = strpos($line, '='); 
+			$name = $pos === false ? $line : trim(substr($line, 0, $pos)); 
+			if(strpos($name, '*') !== false) {
+				$required = true; 
+				$name = trim($name, "* ");
+			}
+			$name = $this->wire('sanitizer')->fieldName($name); 
+			if(empty($name)) continue;
+
+			if(stripos($line, 'requiredIf(') !== false && preg_match('/=\s*requiredIf\(([^)]+)\)\s*/i', $line, $matches))  {
+				$requiredIf = $matches[1];
+				$line = str_replace($matches[0], '', $line);
+			}
+			if(stripos($line, 'showIf(') !== false && preg_match('/=\s*showIf\(([^)]+)\)\s*/i', $line, $matches))  {
+				$showIf = $matches[1];
+				$line = str_replace($matches[0], '', $line);
+			}
+			if(stripos($line, 'if(') !== false && preg_match('/=\s*if\(([^)]+)\)\s*/i', $line, $matches))  {
+				$conditions = $matches[1];	
+				$line = str_replace($matches[0], '', $line);
+			}
+			
+			$label = $pos === false ? $name : trim(substr($line, $pos+1)); 
+			$description = '';
+			$width = 0;
+			$notes = '';
+			if(strpos($label, '=') !== false) {
+				list($label, $description) = explode('=', $label, 2); 
+				$label = trim($label);
+				$description = trim($description); 
+				if(substr($description, -1) == '%') {
+					if(preg_match('/^(.*?)\b=?\s*(\d+)%$/', $description, $matches)) {
+						$description = $matches[1];
+						$width = (int) $matches[2];
+						if($width > 100 || $width < 10) $width = 100; 
+					}
+				}
+				if(strpos($description, '=') !== false) {
+					list($description, $notes) = explode('=', $description, 2);
+					$description = trim($description);
+					$notes = trim($notes);
+				}
+			}
+
+			$schema[$name] = array(
+				0 => $label, 
+				1 => $description, 
+				2 => $width, 
+				3 => $notes, 
+				4 => $required, 
+				5 => $conditions, 
+				6 => $showIf,
+				7 => $requiredIf
+			); 
+		}
+
+		return $schema; 
+	}
+
+	/**
+	 * Given a line-separated string of textarea rules, convert to an associative array
+	 * 
+	 * Returned array is: array(
+	 *   'rule key' => 'rule value',
+	 * );
+	 * 
+	 * @param string $rules
+	 * @return array
+	 * 
+	protected function extractRules($rules) {
+
+		$lines = explode("\n", $rules);
+		$rules = array();
+
+		foreach($lines as $line) {
+			$line = trim($line);
+			if(empty($line)) continue;
+			if(!strpos($line, ':')) continue;
+			list($ruleKey, $ruleValue) = explode(':', $line, 2);
+			$rules[trim($ruleKey)] = trim($ruleValue);
+		}
+		
+		return $rules;
+	}
+	 */
+
+	/**
+	 * Get info about the type of value stored by the Inputfield
+	 * 
+	 * If no property is requested, all properties are returned in an associative array (default).
+	 *
+	 * Properties you can request via the $property argument:  
+	 * 
+	 * - type: Returns one of: ?, Text, Textarea, Boolean, Page, PageArray or Array.
+	 * - fieldtype: Returns related Fieldtype class name, or blank if not applicable.
+	 * - inputfield: Returns Inputfield class name (same as $field->inputfieldClass).
+	 * - csv: Returns CSV string of all properties: type,inputfield,fieldtype
+	 * - if ommitted, all properties are returned in an associative array.
+	 * 
+	 * Uses $field->valueType which contains "type,inputfieldClass,fieldTypeClass".
+	 * The inputfieldClass portion is also stored in $field->inputfieldClass, so it re-appears here 
+	 * only to validate that the valueType info is still current. When no longer current, it figures
+	 * out the 'type' and 'fieldtype' again and updates the $field->valueType (and saves it).
+	 *
+	 * @param Field $field
+	 * @param string $property See notes above
+	 * @return string|array|null Returns requested property, or associative array with all properties. 
+	 *
+	 */
+	public function getValueType(Field $field, $property = '') {
+		
+		$valueType = $field->get('valueType');
+		$valid = false;
+		$inputfieldClass = '';
+		$fieldtypeClass = '';
+		$type = '';
+		
+		if($valueType && strpos($valueType, ',') !== false) {
+			list($type, $inputfieldClass, $fieldtypeClass) = explode(',', $valueType);
+			if($inputfieldClass == $field->get('inputfieldClass')) {
+				$valid = true; 
+			}
+		}
+		
+		if($valid && $inputfieldClass == 'InputfieldPage') {
+			if($type == '?') {
+				// we don't allow "?" type when used with Page fields
+				$valid = false;
+			} 
+		}
+			
+		if(!$valid) {
+			// if we reach this point then valueType contained something no longer valid
+			$type = '?';
+			$fieldtypeClass = '';
+			$inputfieldClass = $field->get('inputfieldClass'); 
+			if(!$inputfieldClass) $inputfieldClass = 'InputfieldTextarea';
+
+			if($inputfieldClass == 'InputfieldPage') {
+				// Page inputfield delegates to other inputfields.
+				// The property 'inputfield' is used by InputfieldPage to refer to delegated inputfield class
+				// similar to how we are using inputfieldClass. 
+				$fieldtypeClass = 'FieldtypePage';
+				if($field->get('inputfield')) {
+					$inputfield = $this->wire('modules')->get($field->get('inputfield'));
+					if($inputfield) {
+						$type = $inputfield instanceof InputfieldHasArrayValue ? 'PageArray' : 'Page';
+					} else {
+						$type = 'PageArray';
+					}
+				}
+
+			} else {
+				// some other inputfield: get an instance of it to examine it further
+				// determine if inputfield is multi-value or not
+				$inputfield = $this->wire('modules')->get($inputfieldClass);
+				
+				if($inputfield instanceof InputfieldHasArrayValue) {
+					$type = 'Array';
+				} else if($inputfield instanceof InputfieldTextarea) {
+					$type = 'Textarea';
+					$fieldtypeClass = 'Textarea';
+				} else if($inputfield instanceof InputfieldText) {
+					$type = 'Text';
+				} else if($inputfield instanceof InputfieldCheckbox) {
+					$type = 'Boolean';
+				}
+			
+				// check if there is a fieldtype of the same name as the Inputfield
+				$_fieldtypeClass = str_replace('Inputfield', 'Fieldtype', $inputfieldClass);
+				if($this->wire('modules')->isInstalled($_fieldtypeClass)) $fieldtypeClass = $_fieldtypeClass;
+			}
+
+			// update valueType stored in $field so we don't have to determine it again next time
+			$field->set('inputfieldClass', $inputfieldClass);
+			$field->set('valueType', "$type:$inputfieldClass:$fieldtypeClass");
+			if($field->flags & Field::flagFieldgroupContext) {
+				// skip it
+			} else {
+				$field->save();
+			}
+		}
+		
+		if($property == 'type') $value = $type;
+			else if($property == 'fieldtype') $value = $fieldtypeClass;
+			else if($property == 'inputfield') $value = $inputfieldClass;
+			else if($property == 'csv') $value = "$type,$inputfieldClass,$fieldtypeClass";
+			else $value = array(
+				'type' => $type, 
+				'fieldtype' => $fieldtypeClass, 
+				'inputfield' => $inputfieldClass
+			);
+		
+		return $value; 
+	}
+
+	/**
+	 * Returns the delegate Fieldtype if applicable or null if not
+	 * 
+	 * @param Field $field
+	 * @return Fieldtype
+	 * 
+	 */
+	public function getFieldtype(Field $field) {
+		$class = $this->getValueType($field, 'fieldtype');
+		if(!$class) return null;
+		return $this->wire('fieldtypes')->get($class);
+	}
+
+	/**
+	 * Get array of allowed Inputfield classes
+	 * 
+	 * @return array associative of className => label
+	 * 
+	 */
+	protected function getAllowedInputfieldClasses() {
+		
+		$allowTypes = $this->allowTypes;
+		$disallowTypes = $this->disallowTypes;
+		$classes = array();
+		if($allowTypes) {}
+		
+		foreach($this->wire('modules')->find("className^=Inputfield") as $fm) {
+			if(in_array($fm->className(), $disallowTypes)) { // || $fm instanceof InputfieldHasArrayValue) {
+				$allow = false;
+			} else {
+				$allow = true; 
+				foreach($disallowTypes as $baseClass) {
+					if(is_subclass_of($fm->className(), $baseClass)) {
+						$allow = false;
+						break;
+					}
+				}
+			}
+			/*
+			} else if(in_array("$fm", $allowTypes)) {
+				$allow = true;
+
+			} else {
+				$allow = false;
+				foreach($allowTypes as $baseClass) {
+					if(is_subclass_of("$fm", $baseClass)) {
+						$allow = true;
+						break;
+					}
+				}
+			}
+			*/
+			if($allow) {
+				$classes["$fm"] = str_replace('Inputfield', '', "$fm"); 
+			}
+		}
+
+		asort($classes);
+		return $classes;
+	}
+
+	/**
+	 * Return array with information about what properties and operators can be used with this field
+	 *
+	 * @param Field $field
+	 * @param array $data Array of extra data, when/if needed
+	 * @return array See FieldSelectorInfo.php for details
+	 *
+	 */
+	public function ___getSelectorInfo(Field $field, array $data = array()) {
+		
+		$a = parent::___getSelectorInfo($field);
+		$defs = $this->getTextareaDefinitions($field);
+		// $languages = $this->wire('languages');
+		// if($languages && $field->multilang == self::multilangNo) $languages = null;
+		$a['subfields'] = array();
+		
+		foreach($defs as $name => $def) {
+			
+			$label = $this->getLabel($field, $name);
+			$subfield = array(
+				'name' => $name,
+				'label' => $label,
+				'input' => 'text',
+				'operators' => array('%=', '^=', '$=', '='),
+				'options' => array(),
+				'subfields' => array(), 
+			);
+			
+			$a['subfields'][$name] = $subfield;
+			/*
+			if(!$languages) continue; 
+			foreach($languages as $language) {
+				if($language->isDefault()) {
+					$a['subfields'][$name]['label'] .= " (" . $language->get('title|name') . ")";
+					$a['subfields'][$name]['name'] .= " (" . $language->get('name') . ")";
+					continue;
+				}
+				$subfield['label'] = "$label (" . $language->get('title|name') . ")";
+				$subfield['name'] = $name . " ($language->name)"; //"___$language->id";
+				$a['subfields']["{$name}___{$language->id}"] = $subfield;
+			}
+			*/
+		}
+		
+		return $a;
+	}
+
+	/**
+	 * Get the query that matches a Fieldtype table's data with a given value
+	 *
+	 * Possible template method: If overridden, children should NOT call this parent method.
+	 *
+	 * @param DatabaseQuerySelect $query
+	 * @param string $table The table name to use
+	 * @param string $subfield Name of the subfield (typically 'data', unless selector explicitly specified another)
+	 * @param string $operator The comparison operator
+	 * @param mixed $value The value to find
+	 * @return DatabaseQuery $query
+	 * @throws WireException
+	 *
+	 */
+	public function getMatchQuery($query, $table, $subfield, $operator, $value) {
+		if($subfield && $subfield != 'data') {
+			// match format: "(^|\r)subfield:value";
+			$languages = $this->wire('languages');
+			$database = $this->wire('database');
+			if($languages && $query->field->get('multilang') == self::multilangNo) $languages = null;
+			$table = $database->escapeTable($table);
+			$value = preg_quote($value);
+			if($languages && count($languages) > 1) {
+				$_subfield = $subfield;
+				foreach($languages as $language) {
+					if($language->isDefault()) continue;
+					$subfield .= "|{$_subfield}___$language->id";
+				}
+				$subfield = "($subfield)";
+			}
+			if($operator == '%=' || $operator == '*=') {
+				$value = "(^|\r)$subfield:[^\r]*$value";
+			} else if($operator == '^=') {
+				$value = "(^|\r)$subfield:$value";
+			} else if($operator == '$=') {
+				$value = "(^|\r)$subfield:[^\r]*$value($|\r)";
+			} else if($operator == '=') {
+				$value = "(^|\r)$subfield:$value($|\r)";
+			} else {
+				throw new WireException("Unsupported operator for Textareas subfield ($subfield): $operator");
+			}
+			$query->where("$table.data RLIKE " . $database->quote($value));
+			return $query;
+		} else {
+			return parent::getMatchQuery($query, $table, $subfield, $operator, $value);
+		}
+	}
+
+	/**
+	 * Render a markup string of the value
+	 *
+	 * Non-markup components should also be entity encoded where appropriate.
+	 *
+	 * Most Fieldtypes don't need to implement this since the default covers most scenarios.
+	 *
+	 * This is different from formatValue() in that it always returns a string (or object that can be
+	 * typecast to a string) that is output ready with markup. Further, this method may be used to render
+	 * specific properties in compound fieldtypes. The intention here is primarily for admin output purposes,
+	 * but can be used front-end where applicable.
+	 *
+	 * This is different from Inputfield::renderValue() in that the context may be outside that of an Inputfield,
+	 * as Inputfields can have external CSS or JS dependencies.
+	 *
+	 * @param Page $page Page that $value comes from
+	 * @param Field $field Field that $value comes from
+	 * @param mixed $value Optionally specify the $page->getFormatted(value), value must be a formatted value.
+	 * 	If null or not specified (recommended), it will be retrieved automatically.
+	 * @param string $property Optionally specify the property or index to render. If omitted, entire value is rendered.
+	 * @return string|MarkupFieldtype Returns a string or object that can be output as a string, ready for output.
+	 * 	Return a MarkupFieldtype value when suitable so that the caller has potential specify additional
+	 * 	config options before typecasting it to a string.
+	 *
+	 */
+	public function ___markupValue(Page $page, Field $field, $value = null, $property = '') {
+		$of = $page->of();
+		if(is_null($value)) $value = $page->get($field->name);
+		if(empty($value)) return '';
+		if($value instanceof TextareasData && !strlen(implode('', $value->getArray()))) return '';
+		if($property) {
+			$classParents = class_parents($field->get('inputfieldClass'));
+			if(in_array('InputfieldTextarea', $classParents)) {
+				// allow for non-encoded HTML to be the markup value
+				if($field->get('contentType') != FieldtypeTextarea::contentTypeUnknown) {
+					$page->of(true);
+					$value = $page->get($field->name);
+					$value = $value ? $value->$property : '';
+					$page->of($of);
+					return $value;
+				}
+			}
+			return parent::___markupValue($page, $field, $value, $property);
+		}
+		$page->of(false);
+		$inputfield = $this->getInputfield($page, $field); 
+		$inputfield->attr('value', $value);
+		$out = $inputfield->renderValue();
+		$page->of($of);
+		return $out;
+		
+		/*
+		$page->of(true);
+		if(is_null($value)) $value = $page->get($field->name);
+		$defs = $this->getTextareaDefinitions($field);
+		$out = '';
+		$sanitizer = $this->wire('sanitizer');
+		foreach($defs as $name => $def) {
+			$label = $this->getLabel($field, $name);
+			$label = $sanitizer->entities($label);
+			$v = $value->$name;
+			if(!strlen($v)) continue;
+			$out .= "<dt>$label</dt><dd>$v</dd>";
+		}
+		if($out) $out = "<dl>$out</dl>";
+		if(!$of) $page->of(false);
+		return $out;
+		*/
+	}
+
+	/**
+	 * Get the Inputfields needed to configure this Field in the field settings "details" tab
+	 *
+	 * @param Field $field
+	 * @return InputfieldWrapper
+	 *
+	 */
+	public function ___getConfigInputfields(Field $field) {
+
+		$inputfields = parent::___getConfigInputfields($field);
+		$languages = $this->wire('languages'); 
+		$examplesLabel = $this->_('Examples:');
+
+		/** @var InputfieldSelect $f */
+		$f = $inputfields->getChildByName('inputfieldClass'); 
+		if(method_exists($f, 'removeOption')) foreach($f->getOptions() as $value => $label) {
+			// remove options set by FieldtypeTextarea so we can get proper alpha order
+			$f->removeOption($value);
+		}
+		$f->addOption('');
+		$f->attr('value', '');
+		$f->description = $this->_('The type of field that will be used to collect input. This can also determine the value(s) output by this field.'); 
+		$f->notes = $this->_('After changing this, you should save immediately as all other configuration options below this (as well as on the Input tab) may change.');
+		foreach($this->getAllowedInputfieldClasses() as $name => $label) {
+			$f->addOption($name, $label); 
+		}
+		$f->attr('value', $field->get('inputfieldClass'));
+		$inputfieldClassSelect = $f; 
+	
+		// hidden valueType
+		$f = $this->modules->get('InputfieldHidden');
+		$f->attr('name', 'valueType');
+		$f->attr('value', $this->getValueType($field, 'csv'));
+		$inputfields->add($f);
+
+		// definitions
+		$f = $this->modules->get('InputfieldTextarea'); 
+		$f->attr('name', 'definitions'); 
+		$f->label = $this->_('Textarea Definitions'); 
+		$f->description = $this->_('Define one textarea per line in the format: "name", or "name=label", "name=label=description",  "name=label=description=notes". The "name" follows the same rules as any other ProcessWire field name (meaning only alphanumeric characters and underscores). The "label" may be any text. The "description" (and/or "notes") are optional and typically represents a longer version of the label, when useful.'); // Textareas definition description 
+		$f->notes = "**$examplesLabel**\n" . 
+			$this->_('address = Mailing Address') . "\n" . 
+			$this->_('city* = City = The city where the author lives (required) = 50%') . "\n" . 
+			$this->_('state = State/Province = Specify 2-character abbreviation = 25%') . "\n" . 
+			$this->_('zip = Zip/Postal Code = 25%') . "\n" . 
+			$this->_('publications = Publications List = Enter the publication titles = One per line = if(template=author)');
+		$f->notes .= "\n\n**" . $this->_('Advanced:') . "**" . 
+			"\n• " . $this->_('Append an asterisk "`*`" to the field "name" to make it required.') . 
+			"\n• " . $this->_('Append "=50%" to any of the mentioned formats to specify a width for the field. The 50% can be any value between 10% and 100%.') . 
+			"\n• " . $this->_('Append "=if(selector)" to make this field applicable only if the page being edited matches the given selector string.') . 
+			"\n• " . $this->_('Append "=showIf(selector)" or "=requiredIf(selector)" to use runtime "show" or "required" field dependencies.'); 
+			
+		$f->attr('value', $field->get('definitions')); 
+		$rows = substr_count($field->get('definitions'), "\n") + 2; 
+		if($rows < 7) $rows = 7; 
+		$f->attr('rows', $rows); 
+		if($languages) {
+			$f->useLanguages = true; 
+			foreach($languages as $language) {
+				if($language->isDefault()) continue; 
+				$f->set("value$language", $field->get("definitions$language")); 
+			}
+			$f->description .= " " . $this->_('**Multi-language note:** When used, the field "name" portion must match in each language. The label and/or description of course can and should be unique for each language.');
+		}
+		$inputfields->prepend($f); 
+		$inputfields->prepend($inputfieldClassSelect);
+	
+		/*
+		$f = $this->wire('modules')->get('InputfieldTextarea');
+		$f->attr('name', 'rules');
+		$f->label = $this->_('Enable/disable fields (optional)');
+		$f->description = $this->_('To use field definitions above only if the edited page matches certain conditions, specify "field: conditions" below, where "conditions" is a selector string.'); // Description for 'rules' 
+		$f->notes = $this->_('For example, the following would use an "address" field only if the template was "event" or "location":') . "\n" . 
+			"address: template=event|location";
+		$f->attr('value', $field->rules);
+		$inputfields->add($f);
+		*/
+
+		if($languages) {
+			$f = $this->modules->get('InputfieldRadios'); 
+			$f->attr('name', 'multilang'); 
+			$f->label = $this->_('Use multi-language support?'); 
+			$f->addOption(self::multilangNo, $this->_('No')); 
+			$f->addOption(self::multilangYes, $this->_('Yes')); 
+			$f->addOption(self::multilangInherit, $this->_('Yes, and inherit values from default language when blank')); 
+			$f->attr('value', (int) $field->get('multilang')); 
+			$inputfields->add($f); 
+		}
+		
+		$type = $this->getValueType($field, 'type');
+		if($type != 'Text' && $type != 'Textarea') {
+			foreach(array('textformatters', 'contentType') as $name) {
+				// remove text-specific config options when not a text field
+				$inputfield = $inputfields->getChildByName($name);
+				if($inputfield) $inputfields->remove($inputfield);
+				unset($field->$name);
+			}
+			if($fieldtype = $this->getFieldtype($field)) {
+				// see if this fieldtype requires any of its own coniguration
+				$fieldtypeInputfields = $fieldtype->getConfigInputfields($field);
+				if(count($fieldtypeInputfields)) {
+					$fieldset = $this->wire('modules')->get('InputfieldFieldset');
+					$fieldset->label = sprintf($this->_('Settings for "%s" type'), str_replace('Fieldtype', '', $fieldtype->className())); 
+					$fieldset->description = $this->_('Please also see additional configuration settings for this type on the Input tab.'); 
+					$n = 0;
+					foreach($fieldtypeInputfields as $f) {
+						if($inputfields->getChildByName($f->name)) {
+							$this->error("Name conflict between Textareas and $fieldtype for property '$f->name'. Selected type may not be compatible for Textareas."); 
+						}
+						$fieldset->add($f);
+						$n++;
+					}
+					if($n) $inputfields->add($fieldset);
+				}
+			}
+		}
+
+		return $inputfields; 
+	}
+
+	/**
+	 * Module configuration	
+	 * 
+	 * @param array $data
+	 * @return InputfieldWrapper
+	 *
+	 */
+	public function getModuleConfigInputfields(array $data) {
+
+		$inputfields = new InputfieldWrapper();
+		if(empty($data['allowTypes'])) $data['allowTypes'] = self::$defaultAllowTypes; 
+		$modules = $this->wire('modules');
+		$f = $modules->get('InputfieldAsmSelect'); 
+		$f->attr('name', 'allowTypes'); 
+		$f->label = __('Allowed input base types for textareas');
+		$f->description = __('Types that extend another are automatically added regardless of your selection here (i.e. selecting Text will also make Textarea and CKEditor as options, etc.)');
+
+		$options = array();
+		
+		foreach($modules->find("className^=Inputfield") as $fm) {
+
+			if($fm instanceof InputfieldHasArrayValue) continue; 
+			if(in_array("$fm", self::$defaultDisallowTypes)) continue; 
+
+			$allow = true; 
+			foreach(self::$defaultDisallowTypes as $baseClass) {
+				if(is_subclass_of("$fm", $baseClass)) $allow = false;
+			}
+		
+			if($allow) {	
+				$options["$fm"] = str_replace("Inputfield", "", "$fm"); 
+			}
+		}
+		ksort($options); 
+		foreach($options as $name => $label) {
+			$add = true;
+			foreach($data['allowTypes'] as $t) {
+				if(is_subclass_of($name, $t)) $add = false;
+			}
+			if($add) $f->addOption($name, $label); 
+		}
+
+		$f->attr('value', $data['allowTypes']); 
+		$inputfields->add($f);
+		return $inputfields; 
+	}
+
+}
+

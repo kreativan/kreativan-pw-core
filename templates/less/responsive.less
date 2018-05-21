@@ -1,0 +1,44 @@
+@tm-mobile-header-height:       70px;
+@tm-mobile-button-width:        80px;
+//======================================================================
+//  Responsive
+//======================================================================
+#mobile-header {
+    position:relative;
+    height: @tm-mobile-header-height;
+    line-height: @tm-mobile-header-height;
+    background: @global-muted-background;
+}
+#mobile-header .mobile-menu-button {
+    position:absolute;
+    display:block;
+    width:@tm-mobile-button-width;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    background: @global-primary-background;
+    color: @global-inverse-color;
+    text-align: center;
+}
+#mobile-header .logo {
+    display:block;
+    box-sizing:border-box;
+    padding-left:@tm-mobile-button-width + 20px;
+    height:100%;
+    width:100%;
+}
+
+/* Desktop and smaller
+====================================================== */
+@media (max-width: 960px) {
+
+	/**
+     *  add .tm-flex-reverse class to .uk-grid
+     *  to reverse direction of child items
+     */
+    .tm-flex-reverse {
+        display: flex;
+        flex-wrap: wrap-reverse;
+    }
+
+}

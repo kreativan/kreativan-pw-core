@@ -1,0 +1,42 @@
+TEXTAREAS FIELDTYPE CHANGELOG
+=============================
+v8 - August 21, 2017
+--------------------
+* Switch to PW3 namespace
+* Add support for import/export per ProcessWire 3.0.71+
+* Other minor tweaks and fixes
+
+v7 - April 3, 2017
+-------------------
+* Combined bugfixes, tweaks and upgrades for 2016-Q1 2017
+
+v6 - August 7, 2015
+-------------------
+* Add support for ajax editing mode (PW 2.6.12+). 
+* Add support for individual "notes" fields for each property. 
+* Add support for searching individual properties from selectors. 
+* Add support for display of individual properties from Lister/ListerPro. 
+* Add support for filtering of individual properties from Lister/ListerPro. 
+* Add support for markupValue (as used in Lister/ListerPro output).
+
+v5 - March 2, 2015
+-----------------------
+* This Fieldtype is now capable of supporting nearly any kind of data type
+  rather than just strings. Examples include Pages, single and multi-choice
+  user definable options (outside of pages), checkbox toggles, dates, 
+  integers, floats and more. It will also work with many 3rd party Inputfields.
+  At this point, we should probably rename this Fieldtype to something 
+  different, as the name is no longer reflective of what it does, so we'll 
+  likely change the name of it by version 6! 
+
+v4 - October 21, 2014
+--------------------------
+* Added new options for multi-language support. See the new multi-language
+  support section in the README.txt file, near the bottom. 
+
+* Added support for individually specified field widths. Now you can specify
+  what width you want each property in your Textareas field to be. When used
+  this overrides any default you may have specified on the Input tab. For 
+  instructions, see the description on the "Textarea Definitions" field 
+  present on the "Details" tab when editing any Textareas field. 
+

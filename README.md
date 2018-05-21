@@ -1,2 +1,2 @@
-# kreativan-pw-core
+# Kreativan Core
 Kreativan Core Processwire Profile

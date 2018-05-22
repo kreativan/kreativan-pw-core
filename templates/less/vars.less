@@ -4,24 +4,12 @@
 //
 // ========================================================================
 
+// Container
+// ========================================================================
+
 @container-max-width:                   1200px;
 @container-small-max-width:             900px;
 @container-large-max-width:             1600px;
-
-// Inverse colors
-// ========================================================================
-
-@inverse-global-color-mode:                     light;
-
-@inverse-global-color:                          fade(@global-inverse-color, 70%);
-@inverse-global-emphasis-color:                 @global-inverse-color;
-@inverse-global-muted-color:                    fade(@global-inverse-color, 50%);
-@inverse-global-inverse-color:                  @global-color;
-
-@inverse-global-primary-background:             @global-inverse-color;
-@inverse-global-muted-background:               fade(@global-inverse-color, 10%);
-
-@inverse-global-border:                         fade(@global-inverse-color, 20%);
 
 // Breakpoints
 // ========================================================================
@@ -86,6 +74,22 @@
 @global-success-background:                     #32d296;
 @global-warning-background:                     #faa05a;
 @global-danger-background:                      #f0506e;
+
+//
+// Inverse colors
+//
+
+@inverse-global-color-mode:                     light;
+
+@inverse-global-color:                          fade(@global-inverse-color, 70%);
+@inverse-global-emphasis-color:                 @global-inverse-color;
+@inverse-global-muted-color:                    fade(@global-inverse-color, 50%);
+@inverse-global-inverse-color:                  @global-color;
+
+@inverse-global-primary-background:             @global-inverse-color;
+@inverse-global-muted-background:               fade(@global-inverse-color, 10%);
+
+@inverse-global-border:                         fade(@global-inverse-color, 20%);
 
 //
 // Borders

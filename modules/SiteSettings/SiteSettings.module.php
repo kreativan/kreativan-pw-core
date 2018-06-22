@@ -1,6 +1,6 @@
 <?php
 /**
- *  KreativanCore Module
+ *  SiteSettings Module
  *
  *  @author Ivan Milincic <lokomotivan@gmail.com>
  *  @copyright 2017 Ivan Milincic
@@ -9,13 +9,13 @@
 */
 
 
-class KreativanCore extends Process {
+class SiteSettings extends Process {
 
-    const MODULE_NAME = 'KreativanCore';
+    const MODULE_NAME = 'SiteSettings';
 
     public static function getModuleInfo() {
 		return array(
-				'title' => 'Kreativan Core',
+				'title' => 'Site Settings',
 				'summary' => 'Main website module. Creates site settings admin page, custom functions and options etc...',
 				'version' => '0.1',
 				'author' => 'Ivan Milincic',

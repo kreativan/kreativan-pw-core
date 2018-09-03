@@ -9,11 +9,12 @@ include('./_head.php'); // include header markup
 			// output 'headline' if available, otherwise 'title'
 			echo "<h1>" . $page->get('headline|title') . "</h1>";
 
+			foreach($page->buttons as $item) {
+				echo renderButton($item->button);
+			}
+
 			// output bodycopy
 			echo $page->body;
-
-			// render navigation to child pages
-			renderNav($page->children);
 
 		?>
 	</div><!-- end content -->

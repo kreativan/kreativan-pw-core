@@ -1,13 +1,46 @@
 <?php
-
 /**
  * Shared functions used by the beginner profile
  *
- * This file is included by the _init.php file, and is here just as an example. 
+ * This file is included by the _init.php file, and is here just as an example.
  * You could place these functions in the _init.php file if you prefer, but keeping
- * them in this separate file is a better practice. 
+ * them in this separate file is a better practice.
+ *
+*/
+
+/**
+ *  Button
  *
  */
+function renderButton($b) {
+
+	$button = "";
+
+   	// attributes
+   	$attr = "";
+   	$attr .= ($b->link_attr[1]) ? " target='_blank'" : "";
+   	$attr .= ($b->link_attr[2]) ? " rel='nofollow'" : "";
+   	$attr .= " title='$b->title'";
+
+   	// href
+   	$href = "#";
+   	if($b->link_type == '2') {
+	   $href = $b->select_page->url;
+   	} elseif($b->link_type == '1') {
+	   $href = $b->link;
+   	}
+
+   	// style
+   	$class = "uk-button-{$b->button_style->title}";
+
+	if(!empty($b->title)) {
+		$button = "<a class='uk-button $class' href='$href' $attr>$b->title</a>";
+	}
+
+   	return $button;
+
+}
+
 
 /**
  * Given a group of pages, render a simple <ul> navigation
@@ -85,7 +118,7 @@ function renderNavTree($items, $maxDepth = 3) {
 		echo "<a href='$item->url'>$item->title</a>";
 
 		// if the item has children and we're allowed to output tree navigation (maxDepth)
-		// then call this same function again for the item's children 
+		// then call this same function again for the item's children
 		if($item->hasChildren() && $maxDepth) {
 			renderNavTree($item->children, $maxDepth-1);
 		}

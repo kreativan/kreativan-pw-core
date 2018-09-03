@@ -14,18 +14,18 @@
 loadFile("js", "", "captcha.js");
 
 // admin email
-$admin_email = !empty($custom_admin_email) ? $custom_admin_email : $system->info->email;
+$admin_email = !empty($custom_admin_email) ? $custom_admin_email : $system->site_info->email;
 // form submit message
 $form_message = !empty($custom_form_message) ? $custom_form_message : $lng___form_message;
 
 // Process Form
-if($input->post->submit) {
+if($input->post->submit && $session->CSRF->hasValidToken()) {
 
     // fields
     $name          = $sanitizer->text($input->post->name);
     $email         = $sanitizer->email($input->post->email);
     $subject       = $sanitizer->text($input->post->subject);
-    $message       = $sanitizer->text($input->post->message);
+    $message       = $sanitizer->textarea($input->post->message);
 
     // captcha
     $q          = $sanitizer->text($input->post->numb_captcha);
@@ -41,12 +41,11 @@ if($input->post->submit) {
     mail("$email_to", "$email_subject", "$email_body", "From: $email_from\nContent-Type: text/html");
 
     // set sesion vars
-    $_SESSION['status'] = "success";
-    $_SESSION['note'] = "$form_message";
+    $session->set("alert", "$form_message");
+    $session->set("status", "status");
 
     // redirect
-   header("Location: $page->url");
-   exit();
+    $session->redirect($page->url);
 
 }
 
@@ -60,7 +59,20 @@ if($input->post->submit) {
     }
  ?>
 
+ <?php if($session->get("alert")) :?>
+	<div id="tm-top-alert" class="uk-alert-<?= $session->get("status") ?>" uk-alert>
+	    <a class="uk-alert-close" uk-close></a>
+	    <p><?= $session->get("alert") ?></p>
+	</div>
+	<?php
+		$session->remove('status');
+		$session->remove('alert');
+	?>
+<?php endif;?>
+
 <form id="contact-form" action="" method="POST">
+
+    <?php echo $session->CSRF->renderInput(); ?>
 
     <div class="uk-child-width-expand@m uk-margin" uk-grid>
         <div>
@@ -80,44 +92,33 @@ if($input->post->submit) {
     </div>
 
     <!-- captcha -->
-    <?php if($kreativanHelper->recaptcha == 1) :?>
+    <div class="uk-margin-top uk-grid-small" uk-grid>
 
-        <div class="uk-margin">
-            <?php echo $kreativanHelper->googleRecaptcha(); ?>
-        </div>
-
-        <div class="uk-margin">
-            <input class="uk-hidden" name="contact_form" value="1" />
-            <button id="button-submit" class="uk-button uk-button-primary" name="submit" value="submit" form="contact-form" disabled><?= $lng___contact_us ?></button>
-        </div>
-
-    <?php else :?>
-        <div class="uk-margin-top uk-grid-small" uk-grid>
-
-            <div class="uk-width-auto@s">
-                <?php
-                    $numb_1 = rand(1, 5);
-                    $numb_2 = rand(1, 5);
-                    $numb_q = "$numb_1 + $numb_2 =";
-                    $answer = $numb_1 + $numb_2;
-                ?>
-                <div class="uk-grid-collapse" uk-grid>
-                    <div class="uk-width-auto uk-flex uk-flex-middle">
-                        <label class="uk-h3"><?= $numb_q ?></label>
-                    </div>
-                    <div class="uk-width-auto">
-                        <input id="numb-captcha-answer" class="uk-hidden" type="text" name="answer" value="<?= $answer ?>" required />
-                        <input id="numb-captcha-q" class="uk-input uk-form-width-xsmall uk-margin-small-left uk-text-center" type="text" name="numb_captcha" placeholder="?" required />
-                    </div>
+        <div class="uk-width-auto@s">
+            <?php
+                $numb_1 = rand(1, 5);
+                $numb_2 = rand(1, 5);
+                $numb_q = "$numb_1 + $numb_2 =";
+                $answer = $numb_1 + $numb_2;
+            ?>
+            <div class="uk-grid-collapse" uk-grid>
+                <div class="uk-width-auto uk-flex uk-flex-middle">
+                    <label class="uk-h3"><?= $numb_q ?></label>
+                </div>
+                <div class="uk-width-auto">
+                    <input id="numb-captcha-answer" class="uk-hidden" type="text" name="answer" value="<?= $answer ?>" required />
+                    <input id="numb-captcha-q" class="uk-input uk-form-width-xsmall uk-margin-small-left uk-text-center" type="text" name="numb_captcha" placeholder="?" required />
                 </div>
             </div>
-
-            <div class="uk-width-expand@s">
-                <input class="uk-hidden" name="contact_form" value="1" />
-                <button id="button-submit" class="uk-button uk-button-primary" name="submit" value="submit" form="contact-form" disabled><?= $lng___contact_us ?></button>
-            </div>
-
         </div>
-    <?php endif;?>
+
+        <div class="uk-width-expand@s">
+            <input class="uk-hidden" name="contact_form" value="1" />
+            <button id="button-submit" class="uk-button uk-button-primary" name="submit" value="submit" form="contact-form" disabled>
+                <?= $lng___contact_us ?>
+            </button>
+        </div>
+
+    </div>
 
 </form>

@@ -1,4 +1,4 @@
-# --- WireDatabaseBackup {"time":"2018-09-03 12:47:35","user":"","dbName":"kreativan-core","description":"","tables":[],"excludeTables":["pages_drafts","pages_roles","permissions","roles","roles_permissions","users","users_roles","user","role","permission"],"excludeCreateTables":[],"excludeExportTables":["field_roles","field_permissions","field_email","field_pass","caches","session_login_throttle","page_path_history"]}
+# --- WireDatabaseBackup {"time":"2018-09-03 12:54:42","user":"","dbName":"kreativan-core","description":"","tables":[],"excludeTables":["pages_drafts","pages_roles","permissions","roles","roles_permissions","users","users_roles","user","role","permission"],"excludeCreateTables":[],"excludeExportTables":["field_roles","field_permissions","field_email","field_pass","caches","session_login_throttle","page_path_history"]}
 
 DROP TABLE IF EXISTS `caches`;
 CREATE TABLE `caches` (
@@ -660,7 +660,7 @@ INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('10
 INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('105', 'FieldtypeTextarea', 'seo_custom', '0', 'Custom', '{\"description\":\"If you want to add other meta tags, you can do it here.\",\"notes\":\"Please use this schema: name := content. One tag per line. Special characters are only allowed in the content part and get converted to HTML.\",\"tags\":\"seo\"}');
 INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('106', 'FieldtypeText', 'seo_robots', '0', 'Robots', '{\"description\":\"The robots settings will tell search engine which data they are allowed to include\\/index.\",\"notes\":\"This overwrites the module\'s global setting for this page.\",\"tags\":\"seo\"}');
 INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('107', 'FieldtypeCheckbox', 'sitemap_ignore', '0', 'Hide page from XML sitemap', '{\"description\":\"Hide this page and its children from the XML sitemap\"}');
-INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('108', 'FieldtypeTextarea', 'text', '0', 'Text', '{\"inputfieldClass\":\"InputfieldTextarea\",\"contentType\":0,\"minlength\":0,\"maxlength\":0,\"showCount\":0,\"rows\":5}');
+INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('108', 'FieldtypeTextarea', 'text', '0', 'Text', '{\"inputfieldClass\":\"InputfieldTextarea\",\"contentType\":0,\"minlength\":0,\"maxlength\":0,\"showCount\":0,\"rows\":5,\"textformatters\":[\"TextformatterNewlineBR\",\"TextformatterMarkdownExtra\",\"TextformatterPstripper\"],\"collapsed\":0}');
 INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('112', 'FieldtypeMapMarker', 'map', '0', 'Map', '{\"schemaVersion\":1,\"defaultAddr\":\"Castaway Cay\",\"defaultLat\":\"26.0936823\",\"defaultLng\":\"-77.5332796\",\"defaultType\":\"ROADMAP\",\"height\":400,\"defaultZoom\":13}');
 INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('113', 'FieldtypeTextareas', 'site_info', '0', 'Site Info', '{\"inputfieldClass\":\"InputfieldText\",\"valueType\":\"Text:InputfieldText:FieldtypeText\",\"definitions\":\"site_name = Site Name = 50%\\nwebsite = Website = 50%\\nemail = Email = 50%\\nphone = Phone= 50%\\naddress = Address\",\"contentType\":0,\"minlength\":0,\"maxlength\":0,\"showCount\":0,\"rows\":5,\"inputWidth\":0,\"collapsed2\":0}');
 INSERT INTO `fields` (`id`, `type`, `name`, `flags`, `label`, `data`) VALUES('114', 'FieldtypeTextareas', 'social_links', '0', 'Social Links', '{\"inputfieldClass\":\"InputfieldText\",\"valueType\":\"Text,InputfieldText,FieldtypeText\",\"definitions\":\"twitter = Twitter\\nfacebook = Facebook\\ninstagram = Instagram\\nlinkedin = LinkedIn\\nyoutube = YouTube\",\"contentType\":0,\"minlength\":0,\"maxlength\":0,\"showCount\":0,\"rows\":5,\"inputWidth\":0,\"collapsed2\":0,\"size\":0}');
@@ -710,7 +710,7 @@ CREATE TABLE `modules` (
   `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `class` (`class`)
-) ENGINE=MyISAM AUTO_INCREMENT=191 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 
 INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('1', 'FieldtypeTextarea', '1', '', '2018-05-21 09:56:12');
 INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('2', 'FieldtypeNumber', '0', '', '2018-05-21 09:56:12');
@@ -826,6 +826,9 @@ INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('184', 
 INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('186', 'SiteSettings', '3', '{\"hide_admin\":\"2\",\"sys_pages\":[],\"uninstall\":\"\",\"submit_save_module\":\"Submit\"}', '2018-09-03 08:33:04');
 INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('189', 'FieldtypeAdminCustomPagesSelect', '1', '', '2018-09-03 12:21:42');
 INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('190', 'ProcessAdminCustomPages', '1', '', '2018-09-03 12:21:59');
+INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('191', 'TextformatterMarkdownExtra', '1', '{\"flavor\":\"2\",\"uninstall\":\"\",\"submit_save_module\":\"Submit\"}', '2018-09-03 12:52:54');
+INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('192', 'TextformatterNewlineBR', '1', '', '2018-09-03 12:53:02');
+INSERT INTO `modules` (`id`, `class`, `flags`, `data`, `created`) VALUES('193', 'TextformatterPstripper', '1', '', '2018-09-03 12:53:09');
 
 DROP TABLE IF EXISTS `page_path_history`;
 CREATE TABLE `page_path_history` (
@@ -1042,4 +1045,4 @@ INSERT INTO `templates` (`id`, `name`, `fieldgroups_id`, `flags`, `cache_time`, 
 
 UPDATE pages SET created_users_id=41, modified_users_id=41, created=NOW(), modified=NOW();
 
-# --- /WireDatabaseBackup {"numTables":44,"numCreateTables":51,"numInserts":472,"numSeconds":0}
+# --- /WireDatabaseBackup {"numTables":44,"numCreateTables":51,"numInserts":475,"numSeconds":0}

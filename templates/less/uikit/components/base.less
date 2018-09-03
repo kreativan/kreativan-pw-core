@@ -259,10 +259,10 @@ svg,
 video { vertical-align: middle; }
 
 /*
- * Responsiveness
- * 1. Set a maximum width
- * 2. Auto scale the height. Only needed if `height` attribute is present
- * 2. Corrects `max-width` behavior if padding and border are used
+ * 1. Add responsiveness.
+ * 2. Auto-scale the height. Only needed if `height` attribute is present.
+ * 3. Corrects responsive `max-width` behavior if padding and border are used.
+ * 4. Exclude SVGs for IE11 because they don't preserve their aspect ratio.
  */
 
 audio,
@@ -277,6 +277,17 @@ video {
     box-sizing: border-box;
 }
 
+/* 4 */
+@supports (display: block) {
+
+   svg {
+        max-width: 100%;
+        height: auto;
+        box-sizing: border-box;
+    }
+
+}
+
 /*
  * Hide the overflow in IE.
  */
@@ -289,6 +300,13 @@ svg:not(:root) { overflow: hidden; }
  */
 
 img:not([src]) { visibility: hidden; }
+
+/*
+ * Iframe
+ * Remove border in all browsers
+ */
+
+iframe { border: 0; }
 
 
 /* Block elements
@@ -539,30 +557,6 @@ summary { display: list-item; }
  */
 
 template { display: none; }
-
-
-/* Iframe
- ========================================================================== */
-
-iframe { border: 0; }
-
-
-/* Prevent the 300ms delay for touchscreen interactions
- ========================================================================== */
-
-/*
- * Most browsers prevent the 300ms delay automatically for sites that use the `width=device-width` property.
- * For Safari on iOS 9.3+, IE 11 and Edge on desktops and IE 11 on Windows Phone 8.1 it must be applied manually.
- */
-
-a,
-area,
-button,
-input,
-label,
-select,
-summary,
-textarea { touch-action: manipulation; }
 
 
 /* Pass media breakpoints to JS

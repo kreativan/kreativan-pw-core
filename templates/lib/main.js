@@ -53,3 +53,18 @@ function markRequiredForm() {
     });
 }
 markRequiredForm();
+
+/**
+ *  Add uk-toggle attribute to all elemets with .tm-toggle class
+ *  Using this to invoke modals and offcanvas via uk-toggle attr
+ *
+ */
+function ukToggleAttr() {
+    var tmToggleElements = document.querySelectorAll(".tm-toggle");
+    if(tmToggleElements.length > 0) {
+        tmToggleElements.forEach(function(e) {
+            e.setAttribute("uk-toggle", "");
+        });
+    }
+}
+ukToggleAttr();

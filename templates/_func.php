@@ -9,6 +9,24 @@
 */
 
 /**
+ *  Breadcrumb
+ *  @example    renderBreadcrumb();
+ *
+ */
+
+function renderBreadcrumb($align = "center") {
+
+    $breadcrumb = "<ul class='uk-breadcrumb uk-flex-$align uk-margin uk-visible@m'>";
+        foreach(wire("page")->parents() as $item) {
+            $breadcrumb .= "<li><a href='$item->url'>$item->title</a></li>";
+        }
+        $breadcrumb .= "<li class='uk-active'><span>".wire('page')->title."</span></li>";
+    $breadcrumb .= "</ul>";
+
+    return $breadcrumb;
+}
+
+/**
  *  Button
  *
  */

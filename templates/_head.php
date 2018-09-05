@@ -46,6 +46,7 @@
 </head>
 
 <body>
+<div class="uk-offcanvas-content">
 
 <div id="mobile-menu" uk-offcanvas="overlay: true">
 	<div class="uk-offcanvas-bar">

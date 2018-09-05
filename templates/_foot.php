@@ -7,7 +7,14 @@
 			<a class="uk-animation-slide-bottom uk-visible@l" href="#" uk-totop uk-scroll></a>
 
 			<p>
-				Copyright © <?= date("Y"); ?> <a href="<?= $system->site_info->website ?>" target="_blank"><?= $system->site_info->site_name ?></a>
+				<?php
+					$site_name = $system->site_info->site_name;
+					$website = "<a href='{$system->site_info->website}'>$site_name</a>";
+					$copyright = str_replace("{{date}}", date("Y"), $system->text);
+					$copyright = str_replace("{{site_name}}", $site_name, $copyright);
+					$copyright = str_replace("{{website}}", $website, $copyright);
+					echo $copyright;
+				?>
 			</p>
 
 		</div>
@@ -20,5 +27,6 @@
 		}
 	?>
 
+</div><!-- offcanvas content end -->
 </body>
 </html>

@@ -8,6 +8,15 @@
  *
 */
 
+// load js
+function loadJS($js) {
+    wire('config')->scripts->add($js);
+}
+// load css
+function loadCSS($css) {
+    wire('config')->styles->add($css);
+}
+
 /**
  *  Breadcrumb
  *  @example    renderBreadcrumb();

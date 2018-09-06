@@ -11,7 +11,7 @@
 */
 
 // load captcha.js
-loadFile("js", "", "captcha.js");
+loadJS($config->urls->templates . "lib/captcha.js");
 
 // admin email
 $admin_email = !empty($custom_admin_email) ? $custom_admin_email : $system->site_info->email;

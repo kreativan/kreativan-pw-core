@@ -51,15 +51,7 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
 
 ?>
 
-<?php
-    if(isset($_SESSION['note'])) {
-        echo ukAlert($_SESSION['status'], $_SESSION['note']);
-        unset($_SESSION['status']);
-        unset($_SESSION['note']);
-    }
- ?>
-
- <?php if($session->get("alert")) :?>
+<?php if($session->get("alert")) :?>
 	<div id="tm-top-alert" class="uk-alert-<?= $session->get("status") ?>" uk-alert>
 	    <a class="uk-alert-close" uk-close></a>
 	    <p><?= $session->get("alert") ?></p>
@@ -70,7 +62,7 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
 	?>
 <?php endif;?>
 
-<form id="contact-form" action="" method="POST">
+<form id="contact-form" action="./" method="POST">
 
     <?php echo $session->CSRF->renderInput(); ?>
 

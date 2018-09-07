@@ -41,7 +41,7 @@
 	<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
 
 	<!-- main js -->
-	<script type='text/javascript' src='<?=  $config->urls->templates . 'lib/main.js' ; ?>'></script>
+	<script defer type='text/javascript' src='<?=  $config->urls->templates . 'lib/main.js' ; ?>'></script>
 
 </head>
 

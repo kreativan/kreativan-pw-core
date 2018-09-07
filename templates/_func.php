@@ -6,6 +6,12 @@
  * You could place these functions in the _init.php file if you prefer, but keeping
  * them in this separate file is a better practice.
  *
+ *	@method loadJS($js)
+ *  @method loadCSS($js)
+ *  @method renderBreadcrumb($align = "center")
+ *  @method renderButton($b)
+ *  @method renderMenu($menu, $class = "")
+ *
 */
 
 // load js
@@ -19,7 +25,8 @@ function loadCSS($css) {
 
 /**
  *  Breadcrumb
- *  @example    renderBreadcrumb();
+ *	@param align
+ *  @example renderBreadcrumb("center");
  *
  */
 
@@ -37,6 +44,9 @@ function renderBreadcrumb($align = "center") {
 
 /**
  *  Button
+ *
+ *	@param b - fieldset object	
+ *	@example renderButton($page->button)	
  *
  */
 function renderButton($b) {

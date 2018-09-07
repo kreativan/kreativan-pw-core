@@ -42,7 +42,7 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
 
     // set sesion vars
     $session->set("alert", "$form_message");
-    $session->set("status", "status");
+    $session->set("status", "primary");
 
     // redirect
     $session->redirect($page->url);

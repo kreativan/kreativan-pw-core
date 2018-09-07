@@ -8,6 +8,7 @@
  *
  *	@method loadJS($js)
  *  @method loadCSS($js)
+ *  @method renderPagination($obj = "", $align = "left")  
  *  @method renderBreadcrumb($align = "center")
  *  @method renderButton($b)
  *  @method renderMenu($menu, $class = "")
@@ -21,6 +22,36 @@ function loadJS($js) {
 // load css
 function loadCSS($css) {
     wire('config')->styles->add($css);
+}
+
+/**
+ *  Pagination
+ *  @var obj  page array
+ *  @example  renderPagination($page->children());
+ *
+ */
+function renderPagination($obj = "", $align = "left") {
+
+    if($obj && $obj != "") {
+
+        $pagination = $obj->renderPager(array(
+            'nextItemLabel'                 => "Next",
+            'previousItemLabel'             => "Prev",
+            'nextItemClass'                 => "pagination-next",
+            'previousItemClass'             => "pagination-prev",
+            'lastItemClass'                 => "pagination-last",
+            'currentItemClass'              => "uk-active",
+            'listMarkup'                    => "<ul class='uk-pagination uk-flex-$align'>{out}</ul>",
+            'itemMarkup'                    => "<li class='{class}'>{out}</li>",
+            'linkMarkup'                    => "<a href='{url}'><span>{out}</span></a>"
+        ));
+
+        if($pagination && $pagination != "") {
+            return $pagination;
+        }
+
+    }
+
 }
 
 /**

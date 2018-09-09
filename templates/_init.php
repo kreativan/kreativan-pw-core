@@ -11,8 +11,8 @@
  *
  */
 
-include_once("./_func.php"); // include our shared functions
-include_once("./_lang.php");
+include_once("./helpers/_func.php"); // include our shared functions
+include_once("./helpers/_lang.php");
 
 $home           = $pages->get("/");
 $system         = $pages->get("template=system");

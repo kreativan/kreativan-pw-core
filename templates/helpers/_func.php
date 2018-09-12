@@ -80,9 +80,11 @@ function renderBreadcrumb($align = "center") {
  *	@example renderButton($page->button)	
  *
  */
-function renderButton($b) {
+function renderButton($b, $class = "") {
 
 	$button = "";
+	
+	$class = !empty($size) ? $size : "";
 
    	// attributes
    	$attr = "";
@@ -99,10 +101,10 @@ function renderButton($b) {
    	}
 
    	// style
-   	$class = "uk-button-{$b->button_style->title}";
+   	$style = "uk-button-{$b->button_style->title}";
 
 	if(!empty($b->title)) {
-		$button = "<a class='uk-button $class' href='$href' $attr>$b->title</a>";
+		$button = "<a class='uk-button $style $class' href='$href' $attr>$b->title</a>";
 	}
 
    	return $button;

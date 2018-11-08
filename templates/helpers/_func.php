@@ -84,7 +84,7 @@ function renderButton($b, $class = "") {
 
 	$button = "";
 	
-	$class = !empty($size) ? $size : "";
+	$class = !empty($class) ? $class : "";
 
    	// attributes
    	$attr = "";

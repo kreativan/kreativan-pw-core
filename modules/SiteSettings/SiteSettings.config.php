@@ -39,8 +39,8 @@ class SiteSettingsConfig extends ModuleConfig {
 				'2' => "No"
 			);
 			$f->required = true;
-			$f->defaultValue = 1;
-			$f->optionColumns = 1;
+			$f->defaultValue = "2";
+			$f->optionColumns = "1";
 			$f->columnWidth = "100%";
 			$module_options->add($f);
 
@@ -53,7 +53,9 @@ class SiteSettingsConfig extends ModuleConfig {
 			$module_options->add($f);
 
 			// render fieldset
-			$inputfields->add($module_options);
+            $inputfields->add($module_options);
+            
+            
 
 		// render fields
 		return $inputfields;

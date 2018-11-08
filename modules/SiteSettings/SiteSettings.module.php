@@ -2,88 +2,66 @@
 /**
  *  SiteSettings Module
  *
- *  @author Ivan Milincic <lokomotivan@gmail.com>
- *  @copyright 2017 Ivan Milincic
+ *  @author Ivan Milincic <kreativan@outlook.com>
+ *  @copyright 2018 Kreativan
  *
  *
 */
 
-
 class SiteSettings extends Process {
 
-    const MODULE_NAME = 'SiteSettings';
-
-    public static function getModuleInfo() {
-		return array(
-				'title' => 'Site Settings',
-				'summary' => 'Main website module. Creates site settings admin page, custom functions and options etc...',
-				'version' => '0.1',
-				'author' => 'Ivan Milincic',
-				'icon' => 'cog',
-                'autoload' => true,
-                'singular' => true,
-				'href' => 'http://modules.processwire.com/',
-                'page' => array(
-					'name' => "settings",
-					'parent' => "setup",
-					'title' => "Site Settings",
-					'sort' => "0",
-				),
-				'singular' => true, // need for Redirect
-            	'autoload' => true, // need for Redirect
-				'permission' => 'page-view',
-			);
+	/**
+	 * This is an optional initialization function called before any execute functions.
+	 *
+	 * If you don't need to do any initialization common to every execution of this module,
+	 * you can simply remove this init() method.
+	 *
+	 */
+	public function init() {
+		parent::init(); // always remember to call the parent init
+		
+		// run hidePages
+        $this->addHookAfter('ProcessPageList::execute', $this, 'hidePages');
+		
 	}
 
-    public function init() {
-        parent::init(); // always remember to call the parent init
+	/**
+     *  Include Admin File
+     *  Custom Admin UI
+     *  @var file_name
+     *	@var page_name	used to indentify subpages: URL =  $page->url . $page_name
+     *  @example return $this->files->render("MY_ADMIN_FILE.php", $vars);
+     *
+     */
+    private function includeAdminFile($file_name, $page_name = "") {
 
-        if(strpos($_SERVER['REQUEST_URI'], $this->wire('config')->urls->admin) === 0) {
+        // define variables you want to pass to the included file
+        $vars = [
+            "this_module" => $this,
+			"page_name" => $page_name,
+            "module_edit_URL" => $this->urls->admin . "module/edit?name=" . $this->className() . "&collapse_info=1",
+        ];
 
-            // add custom js file to admin area
-            $this->config->scripts->append($this->config->urls->siteModules . self::MODULE_NAME ."/assets/admin.js");
-
-            /**
-             *  Pass vars to JavaScript
-             *  @example var kreativan = ProcessWire.config.kreativan;
-             *  @example console.log(kreativan)
-             *
-            */
-            $this->config->js('kreativan', [
-                'homeURL' => $this->config->urls->root,
-            ]);
-
-        }
-
-        // run hidePages
-        $this->addHookAfter('ProcessPageList::execute', $this, 'hidePages');
+        $template_file = $this->config->paths->siteModules . $this->className() . "/" . $file_name;
+        return $this->files->render($template_file, $vars);
 
     }
 
+
     /**
-     *  Main module page
+     * This function is executed when a page with your Process assigned is accessed.
+     *
+     * This can be seen as your main or index function. You'll probably want to replace
+     * everything in this function.
      *
      */
     public function ___execute() {
-        $system_url = wire("config")->urls->admin  . "page/edit/?id=" . wire("pages")->get("template=system")->id;
-        return wire("session")->redirect($system_url);
-    }
 
-    /**
-     * Install the module
-     */
-    public function ___install() {
-        parent::___install();
+       $system_url = wire("config")->urls->admin  . "page/edit/?id=" . wire("pages")->get("template=system")->id;
+       return wire("session")->redirect($system_url);
 
     }
-
-    /**
-     * Uninstall the module
-     */
-    public function ___uninstall() {
-        parent::___uninstall();
-
-    }
+    
 
     /**
     *  Intercept page tree json and remove page from it
@@ -120,5 +98,28 @@ class SiteSettings extends Process {
         }
 
     }
+
+
+	/**
+	 * Called only when your module is installed
+	 *
+	 * If you don't need anything here, you can simply remove this method.
+	 *
+	 */
+	public function ___install() {
+		parent::___install(); // always remember to call parent method
+	}
+
+	/**
+	 * Called only when your module is uninstalled
+	 *
+	 * This should return the site to the same state it was in before the module was installed.
+	 *
+	 * If you don't need anything here, you can simply remove this method.
+	 *
+	 */
+	public function ___uninstall() {
+		parent::___uninstall(); // always remember to call parent method
+	}
 
 }

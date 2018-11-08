@@ -5,7 +5,7 @@ Kreativan Core Processwire Profile
 * Direct output method
 * UIkit 3 Framework
 * Custom Core Module
-* Site Settings page men menu item
+* Site Settings
 
 ### How to use?
 Just clone the repo, download latest processwire and uplaod it to the same folder, navigae to the url to run install...

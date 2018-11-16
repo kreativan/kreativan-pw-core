@@ -26,6 +26,16 @@
 			echo $system->google_analytics;
 		}
 	?>
+	
+	<?php
+    	// Dynamic js/css files
+    	foreach($config->styles->unique() as $file) {
+    		echo "<link rel='stylesheet' type='text/css' href='$file' />";
+    	}
+    	foreach($config->scripts->unique() as $file) {
+    		echo "<script type='text/javascript' src='$file'></script>";
+    	}
+    ?>
 
 </div><!-- offcanvas content end -->
 </body>

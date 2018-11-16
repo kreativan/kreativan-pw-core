@@ -49,18 +49,10 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
 
 }
 
-?>
+// Form Submit Alert
+echo renderAlert();
 
-<?php if($session->get("alert")) :?>
-	<div id="tm-top-alert" class="uk-alert-<?= $session->get("status") ?>" uk-alert>
-	    <a class="uk-alert-close" uk-close></a>
-	    <p><?= $session->get("alert") ?></p>
-	</div>
-	<?php
-		$session->remove('status');
-		$session->remove('alert');
-	?>
-<?php endif;?>
+?>
 
 <form id="contact-form" action="./" method="POST">
 

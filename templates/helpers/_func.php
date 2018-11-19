@@ -157,27 +157,29 @@ function renderMenu($menu, $class = "") {
 
 /**
  *  Display UIkit alert based on @var status and @var alert session
- *  renderAlert() 
- * 
+ *  @example renderAlert()
+ *  or with custom vars
+ *  @example("my_status", "my_alert");
+ *
  */
-function renderAlert() {
+function renderAlert($status = "status", $alert = "alert") {
 
-    if(wire("session")->get("alert")) {
+    if(wire("session")->get($alert)) {
 
-        $status     = wire("session")->get('status');
-        $alert      = wire("session")->get('alert');
+        $this_status = wire("session")->get($status);
+        $this_alert  = wire("session")->get($alert);
+
+        wire("session")->remove($status);
+        wire("session")->remove($alert);
 
         $ukAlert = "
-            <div class='uk-alert-$status' uk-alert>
+            <div class='uk-alert-$this_status' uk-alert>
                 <a class='uk-alert-close' uk-close></a>
-                <p>$alert</p>
+                <p>$this_alert</p>
             </div>
         ";
 
         return $ukAlert;
-
-        wire("session")->remove('status');
-        wire("session")->remove('alert');
 
     }
 

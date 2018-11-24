@@ -14,6 +14,20 @@
 include_once("./helpers/_func.php"); // include our shared functions
 include_once("./helpers/_lang.php");
 
+$home           = $pages->get("/");
+$site_settngs   = $pages->get("template=system");
+
+/**
+ *  We are passing this as a parametar
+ *  when using $files->include()
+ * 
+ */
+$global_vars = [
+    "home" => $home,
+    "site_settings" => $site_settings,
+    "site_info" => $site_settings->site_info, 
+];
+
 /**
  *  Global Settings
  *  using setting() functions API
@@ -21,6 +35,6 @@ include_once("./helpers/_lang.php");
  * 
  */
 setting([
-    "home" => $pages->get("/"),
-    "system" => $pages->get("template=system"),
+    "email" => $site_settings->site_info->email,
+    "phone" => $site_setting->site_info->phone,
 ]);

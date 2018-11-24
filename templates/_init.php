@@ -14,15 +14,13 @@
 include_once("./helpers/_func.php"); // include our shared functions
 include_once("./helpers/_lang.php");
 
-$home           = $pages->get("/");
-$system         = $pages->get("template=system");
-
 /**
- *  Pass global vars when using
- *  @example $files->indlude("my_file.php", $global_vars);
- *
+ *  Global Settings
+ *  using setting() functions API
+ *  require processwire 3.0.119+ 
+ * 
  */
-$global_vars = [
-    "home" => $home,
-    "system" => $system,
-];
+setting([
+    "home" => $pages->get("/"),
+    "system" => $pages->get("template=system"),
+]);

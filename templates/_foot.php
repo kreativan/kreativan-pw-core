@@ -8,9 +8,9 @@
 
 			<p>
 				<?php
-					$site_name = $system->site_info->site_name;
-					$website = "<a href='{$system->site_info->website}'>$site_name</a>";
-					$copyright = str_replace("{{date}}", date("Y"), $system->text);
+					$site_name = $site_info->site_name;
+					$website = "<a href='{$site_info->website}'>$site_name</a>";
+					$copyright = str_replace("{{date}}", date("Y"), $site_settings->text);
 					$copyright = str_replace("{{site_name}}", $site_name, $copyright);
 					$copyright = str_replace("{{website}}", $website, $copyright);
 					echo $copyright;
@@ -26,7 +26,7 @@
 			echo $system->google_analytics;
 		}
 	?>
-	
+
 	<?php
     	// Dynamic js/css files
     	foreach($config->styles->unique() as $file) {

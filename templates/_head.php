@@ -64,10 +64,10 @@
 <div id="mobile-header" class="uk-hidden@m">
 	<a class="mobile-menu-button" href="#mobile-menu" uk-toggle><span uk-icon="icon: menu"></span></a>
 	<a class="logo" href="<?= $pages->get("/")->url ?>">
-		<?php if(!empty($system->logo)) :?>
-			<img src="<?= $system->logo->url ?>" alt="logo" />
+		<?php if(!empty($site_settings->logo)) :?>
+			<img src="<?= $site_settings->logo->url ?>" alt="logo" />
 		<?php else: ?>
-			<div class="uk-margin-remove uk-inline"><?= $system->site_info->site_name ?></div>
+			<div class="uk-margin-remove uk-inline"><?= $site_info->site_name ?></div>
 		<?php endif;?>
 	</a>
 </div>
@@ -76,12 +76,12 @@
 	<div class="uk-container uk-flex uk-flex-middle">
 
 		<div id="logo" class="logo uk-width-auto">
-			<?php if(!empty($system->logo)) :?>
+			<?php if(!empty($site_settings->logo)) :?>
 				<a href="<?= $pages->get(1)->url ?>">
-					<img src="<?= $system->logo->url ?>" alt="logo" />
+					<img src="<?= $site_settings->logo->url ?>" alt="logo" />
 				</a>
 			<?php else :?>
-				<h3 class="uk-margin-remove"><?= $system->site_info->site_name ?></h3>
+				<h3 class="uk-margin-remove"><?= $site_info->site_name ?></h3>
 			<?php endif;?>
 		</div>
 

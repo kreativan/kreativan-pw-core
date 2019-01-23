@@ -1,4 +1,5 @@
-<?php
+<?php namespace ProcessWire;
+
 $lng___read_more            = __('Read More');
 
 // contact

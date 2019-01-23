@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Initialization file for template files
  *
@@ -15,14 +14,27 @@ include_once("./helpers/_func.php"); // include our shared functions
 include_once("./helpers/_lang.php");
 
 $home           = $pages->get("/");
-$system         = $pages->get("template=system");
+$site_settings  = $pages->get("template=system");
+$site_info      = $site_settings->site_info;
 
 /**
- *  Pass global vars when using
- *  @example $files->indlude("my_file.php", $global_vars);
+ *  We are passing this as a parametar
+ *  when using $files->include()
  *
  */
 $global_vars = [
     "home" => $home,
-    "system" => $system,
+    "site_settings" => $site_settings,
+    "site_info" => $site_settings->site_info,
 ];
+
+/**
+ *  Global Settings
+ *  using setting() functions API
+ *  require processwire 3.0.119+
+ *
+ */
+setting([
+    "email" => $site_settings->site_info->email,
+    "phone" => $site_settings->site_info->phone,
+]);

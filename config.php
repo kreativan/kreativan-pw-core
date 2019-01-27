@@ -36,8 +36,6 @@ $config->debug = true;
 
 $config->prependTemplateFile = '_init.php';
 $config->defaultAdminTheme = 'AdminThemeUikit';
-
-// so we can use setting()
 $config->useFunctionsAPI = true;
 
 

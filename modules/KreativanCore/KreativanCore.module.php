@@ -1,6 +1,6 @@
 <?php
 /**
- *  SiteSettings Module
+ *  KreativanCore Module
  *
  *  @author Ivan Milincic <kreativan@outlook.com>
  *  @copyright 2018 Kreativan
@@ -8,7 +8,7 @@
  *
 */
 
-class SiteSettings extends Process {
+class KreativanCore extends Process {
 
 	/**
 	 * This is an optional initialization function called before any execute functions.

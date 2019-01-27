@@ -1,6 +1,6 @@
 <?php
 /**
- *  SiteSettings Config
+ *  KreativanCore Config
  *
  *  @author Ivan Milincic <lokomotivan@gmail.com>
  *  @copyright 2018 Ivan Milincic
@@ -8,7 +8,7 @@
  *
 */
 
-class SiteSettingsConfig extends ModuleConfig {
+class KreativanCoreConfig extends ModuleConfig {
 
 	public function getInputfields() {
 		$inputfields = parent::getInputfields();

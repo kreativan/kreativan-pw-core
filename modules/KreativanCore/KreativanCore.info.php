@@ -13,10 +13,10 @@
 $info = array(
 
 	// Your module's title
-	'title' => 'Site Settings',
+	'title' => 'Kreativan: Site Settings',
 
 	// A 1 sentence description of what your module does
-	'summary' => 'Manage and store global site settings',
+	'summary' => 'Core module for global site settings',
 
 	// Module version number: use 1 for 0.0.1 or 100 for 1.0.0, and so on
 	'version' => 1,
@@ -42,7 +42,8 @@ $info = array(
 	'page' => array(
 		'name' => 'site-settings',
 		'parent' => 'setup',
-		'title' => 'Site Settings'
+        'title' => 'Site Settings',
+        'sort' => 1,
 	),
 
 	// optional extra navigation that appears in admin
@@ -68,6 +69,6 @@ $info = array(
     // and the file: /wire/core/Module.php
     
     'singular' => true,
-    'autoload' => true,
+    'autoload' => false,
 
 );

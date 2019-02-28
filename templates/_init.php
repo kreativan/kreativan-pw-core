@@ -10,7 +10,8 @@
  *
  */
 
-include_once("./helpers/_func.php"); // include our shared functions
+include_once("./helpers/_func.php");
+include_once("./helpers/_render.php");
 include_once("./helpers/_lang.php");
 
 $home           = $pages->get("/");

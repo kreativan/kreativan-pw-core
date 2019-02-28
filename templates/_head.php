@@ -49,7 +49,6 @@
 </head>
 
 <body>
-<div class="uk-offcanvas-content">
 
 <div id="mobile-menu" uk-offcanvas="overlay: true">
 	<div class="uk-offcanvas-bar">
@@ -75,26 +74,29 @@
 	</a>
 </div>
 
-<section id="header" class="uk-section-muted uk-visible@m">
-	<div class="uk-container uk-flex uk-flex-middle">
+<div id="wrapper" class="uk-offcanvas-content">
 
-		<div id="logo" class="logo uk-width-auto">
-			<?php if(!empty($site_settings->logo)) :?>
-				<a href="<?= $pages->get(1)->url ?>">
-					<img src="<?= $site_settings->logo->url ?>" alt="logo" />
-				</a>
-			<?php else :?>
-				<h3 class="uk-margin-remove"><?= $site_info->site_name ?></h3>
-			<?php endif;?>
+	<section id="header" class="uk-section-muted uk-visible@m">
+		<div class="uk-container uk-flex uk-flex-middle">
+
+			<div id="logo" class="logo uk-width-auto">
+				<?php if(!empty($site_settings->logo)) :?>
+					<a href="<?= $pages->get(1)->url ?>">
+						<img src="<?= $site_settings->logo->url ?>" alt="logo" />
+					</a>
+				<?php else :?>
+					<h3 class="uk-margin-remove"><?= $site_info->site_name ?></h3>
+				<?php endif;?>
+			</div>
+
+			<div id="navbar" class="uk-width-expand uk-margin-left">
+				<!--
+
+						add your navbar - main menu here
+
+				-->
+			</div>
+
 		</div>
+	</section>
 
-		<div id="navbar" class="uk-width-expand uk-margin-left">
-			<!--
-
-					add your navbar - main menu here
-
-			-->
-		</div>
-
-	</div>
-</section>

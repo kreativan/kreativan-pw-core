@@ -34,6 +34,7 @@ if(!defined("PROCESSWIRE")) die();
  */
 $config->debug = true;
 
+$config->advanced = true;
 $config->prependTemplateFile = '_init.php';
 $config->defaultAdminTheme = 'AdminThemeUikit';
 $config->useFunctionsAPI = true;

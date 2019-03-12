@@ -12,7 +12,7 @@
 
 include_once("./helpers/_func.php");
 include_once("./helpers/_render.php");
-include_once("./helpers/_lang.php");
+include_once("./_lang.php");
 
 $home           = $pages->get("/");
 $site_settings  = $pages->get("template=system");

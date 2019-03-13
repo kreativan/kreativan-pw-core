@@ -1,6 +1,6 @@
 <?php
 /**
- *  KreativanCore Module
+ *  SiteSettings Module
  *
  *  @author Ivan Milincic <kreativan@outlook.com>
  *  @copyright 2018 Kreativan
@@ -8,7 +8,7 @@
  *
 */
 
-class KreativanCore extends Process {
+class SiteSettings extends Process {
 
 	/**
 	 * This is an optional initialization function called before any execute functions.
@@ -19,18 +19,32 @@ class KreativanCore extends Process {
 	 */
 	public function init() {
 		parent::init(); // always remember to call the parent init
-		
+
 		// run hidePages
         $this->addHookAfter('ProcessPageList::execute', $this, 'hidePages');
-		
+
 	}
+
+	/**
+     * This function is executed when a page with your Process assigned is accessed.
+     *
+     * This can be seen as your main or index function. You'll probably want to replace
+     * everything in this function.
+     *
+     */
+    public function ___execute() {
+
+       $system_url = wire("config")->urls->admin  . "page/edit/?id=" . wire("pages")->get("template=system")->id;
+       return wire("session")->redirect($system_url);
+
+    }
 
 	/**
      *  Include Admin File
      *  Custom Admin UI
      *  @var file_name
      *	@var page_name	used to indentify subpages: URL =  $page->url . $page_name
-     *  @example return $this->files->render("MY_ADMIN_FILE.php", $vars);
+     *  @example return $this->files->render("MY_ADMIN_FILE.php", "page_name");
      *
      */
     private function includeAdminFile($file_name, $page_name = "") {
@@ -47,21 +61,6 @@ class KreativanCore extends Process {
 
     }
 
-
-    /**
-     * This function is executed when a page with your Process assigned is accessed.
-     *
-     * This can be seen as your main or index function. You'll probably want to replace
-     * everything in this function.
-     *
-     */
-    public function ___execute() {
-
-       $system_url = wire("config")->urls->admin  . "page/edit/?id=" . wire("pages")->get("template=system")->id;
-       return wire("session")->redirect($system_url);
-
-    }
-    
 
     /**
     *  Intercept page tree json and remove page from it

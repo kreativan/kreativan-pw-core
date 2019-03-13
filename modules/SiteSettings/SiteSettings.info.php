@@ -13,7 +13,7 @@
 $info = array(
 
 	// Your module's title
-	'title' => 'Kreativan: Site Settings',
+	'title' => 'Site Settings',
 
 	// A 1 sentence description of what your module does
 	'summary' => 'Core module for global site settings',
@@ -67,8 +67,8 @@ $info = array(
 
 	// for more options that you may specify here, see the file: /wire/core/Process.php
     // and the file: /wire/core/Module.php
-    
+
     'singular' => true,
-    'autoload' => true,
+    'autoload' => false,
 
 );

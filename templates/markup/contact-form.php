@@ -26,40 +26,52 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
     $email         = $sanitizer->email($input->post->email);
     $subject       = $sanitizer->text($input->post->subject);
     $message       = $sanitizer->textarea($input->post->message);
-
+	
+	// honeypot
+	$honeypot	= $input->post->honeypot;
+	
     // captcha
     $q          = $sanitizer->text($input->post->numb_captcha);
     $answer     = $sanitizer->text($input->post->answer);
 
-    // email
-    $email_to       = $admin_email;
-    $email_subject  = !empty($subject) ? $subject : $name;
-    $email_from     = $email;
-    $email_body     = "<p>$message</p>";
+	if(empty($honeypot) && $q == $answer) {
+		
+		// email vars
+		$email_to       = $admin_email;
+		$email_subject  = !empty($subject) ? $subject : $name;
+		$email_from     = $email;
+		$email_body     = "<p>$message</p>";
+		
+		// send email
+		mail("$email_to", "$email_subject", "$email_body", "From: $email_from\nContent-Type: text/html");
 
-    // send email
-    mail("$email_to", "$email_subject", "$email_body", "From: $email_from\nContent-Type: text/html");
-
-    // set sesion vars
-    $session->set("alert", "$form_message");
-    $session->set("status", "primary");
+		// set sesion vars
+		$session->set("alert", "$form_message");
+		$session->set("status", "primary");
+		
+	}
 	
 	// Reset token
-    $session->CSRF->resetToken();
+	$session->CSRF->resetToken();
 
-    // redirect
-    $session->redirect($page->url);
+	// redirect
+	$session->redirect($page->url);
 
 }
 
 // Form Submit Alert
-echo renderAlert();
+if($session->get("alert")) {
+    echo renderAlert($session->get("status"), $session->get("alert"));
+    $session-remove("status");
+    $session-remove("alert");
+}
 
 ?>
 
 <form id="contact-form" action="./" method="POST">
 
     <?php echo $session->CSRF->renderInput(); ?>
+	<input class="uk-hidden" type="email" name="honeypot" />
 
     <div class="uk-child-width-expand@m uk-margin" uk-grid>
         <div>

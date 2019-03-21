@@ -45,7 +45,7 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
     $session->set("status", "primary");
 	
 	// Reset token
-    $sessionCSRF->resetToken();
+    $session->CSRF->resetToken();
 
     // redirect
     $session->redirect($page->url);

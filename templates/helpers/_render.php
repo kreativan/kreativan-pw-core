@@ -120,7 +120,7 @@ function renderAlert($style = "primary", $text = "") {
         </div>
     ";
 
-    return $ukAlert;
+   if(!empty($text)) return $ukAlert;
 
 }
 

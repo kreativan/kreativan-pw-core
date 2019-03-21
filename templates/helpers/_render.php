@@ -6,6 +6,7 @@
  *  @method renderBreadcrumb()
  *  @method renderMenu(
  *	@method renderAlert()
+ *	@method renderButton()
  *
 */
 

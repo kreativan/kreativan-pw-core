@@ -62,8 +62,8 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
 // Form Submit Alert
 if($session->get("alert")) {
     echo renderAlert($session->get("status"), $session->get("alert"));
-    $session-remove("status");
-    $session-remove("alert");
+    $session->remove("status");
+    $session->remove("alert");
 }
 
 ?>

@@ -1,14 +1,3 @@
-<?php
-/**
- *  Head
- *
- *  @author Ivan Milincic <lokomotivan@gmail.com>
- *  @copyright 2018 Ivan Milincic
- *
- *
-*/
-
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

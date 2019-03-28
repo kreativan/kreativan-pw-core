@@ -54,6 +54,7 @@ function markRequiredForm() {
 }
 markRequiredForm();
 
+
 /**
  *  Add uk-toggle attribute to all elemets with .tm-toggle class
  *  Using this to invoke modals and offcanvas via uk-toggle attr
@@ -68,3 +69,44 @@ function ukToggleAttr() {
     }
 }
 ukToggleAttr();
+
+
+/**
+ *  Validate Form
+ *  @var formID    string, form css id
+ *
+ *  @example validateForm("#my-form");
+ *  @return object
+ *  @example validateForm("#my-form").status;
+ *  @return bool
+ *
+ */
+function validateForm(formID) {
+
+    var errors = "";
+
+    var selector = `${formID} input:not(.uk-hidden), ${formID} textarea, ${formID} select, ${formID} radio, ${formID} checkbox`;
+    var fields = document.querySelectorAll(selector);
+    //console.log(fields);
+
+    fields.forEach(e => {
+
+        if(e.checkValidity() === false) {
+            //console.log(e);
+            let name = e.getAttribute("name");
+            errors += (errors == "") ? name  : "," + name;
+        }
+
+    });
+
+    var validate = (errors != "") ? false : true;
+    var response = {
+        "status": validate,
+        "errors": errors
+    }
+
+    //console.log(response)
+
+    return response;
+
+}

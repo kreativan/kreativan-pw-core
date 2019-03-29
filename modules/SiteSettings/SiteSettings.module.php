@@ -72,7 +72,7 @@ class SiteSettings extends Process {
     public function hidePages(HookEvent $event){
 
         // get system pages
-        $sysPagesArr = $this->sys_pages;
+        $sysPagesArr = !empty($this->sys_pages) ? $this->sys_pages : [];
 
         // aditional pages to hide by ID
         $customArr = [];

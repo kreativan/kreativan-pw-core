@@ -42,8 +42,8 @@ class SiteSettings extends Process {
 	/**
      *  Include Admin File
      *  Custom Admin UI
-     *  @var file_name
-     *	@var page_name	used to indentify subpages: URL =  $page->url . $page_name
+     *  @param string $file_name
+     *	@param string $page_name used to indentify subpages: URL =  $page->url . $page_name
      *  @example return $this->files->render("MY_ADMIN_FILE.php", "page_name");
      *
      */
@@ -65,8 +65,6 @@ class SiteSettings extends Process {
     /**
     *  Intercept page tree json and remove page from it
     *  We will remove page by its template
-    *  @var pagetemplate template of the current page in a loop
-    *  @var sysPagesArr Array of tamplates we wish to remove
     *
     */
     public function hidePages(HookEvent $event){

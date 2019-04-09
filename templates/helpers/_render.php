@@ -2,26 +2,26 @@
 /**
  *  Render Functions
  *
- *  @method renderPagination()
- *  @method renderBreadcrumb()
- *  @method renderMenu(
- *	@method renderAlert()
- *	@method renderButton()
+ *  renderPagination()
+ *  renderBreadcrumb()
+ *  renderMenu(
+ *	renderAlert()
+ *	renderButton()
  *
 */
 
 
 /**
  *  Pagination
- *  @var obj  page array
+ *  @param PageArray $p
  *  @example  renderPagination($page->children());
  *
  */
-function renderPagination($obj = "", $align = "left") {
+function renderPagination($p = "", $align = "left") {
 
-    if($obj && $obj != "") {
+    if($p && $p != "") {
 
-        $pagination = $obj->renderPager(array(
+        $pagination = $p->renderPager(array(
             'nextItemLabel'                 => "Next",
             'previousItemLabel'             => "Prev",
             'nextItemClass'                 => "pagination-next",
@@ -44,7 +44,7 @@ function renderPagination($obj = "", $align = "left") {
 
 /**
  *  Breadcrumb
- *	@param align
+ *	@param string $align    left|center|right
  *  @example renderBreadcrumb("center");
  *
  */
@@ -64,8 +64,8 @@ function renderBreadcrumb($align = "center") {
 /**
  *  Menu - Nav
  *
- *  @param menu repeater
- *  @param class str = uikit nav class
+ *  @param Field $menu repeater
+ *  @param string $class uikit nav class
  *
  */
 function renderMenu($menu, $class = "") {
@@ -107,8 +107,8 @@ function renderMenu($menu, $class = "") {
 
 /**
  *  Display UIkit alert
- *  @var style  string, primary/success/warning/danger
- *  @var text   string
+ *  @var string $style  primary/success/warning/danger
+ *  @var string $text  
  *
  */
 function renderAlert($style = "primary", $text = "") {
@@ -128,7 +128,7 @@ function renderAlert($style = "primary", $text = "") {
 /**
  *  Button
  *
- *	@param b - fieldset object
+ *	@param Field $b button FieldSetPage field
  *	@example renderButton($page->button)
  *
  */

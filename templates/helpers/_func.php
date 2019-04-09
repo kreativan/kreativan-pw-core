@@ -6,11 +6,11 @@
  * You could place these functions in the _init.php file if you prefer, but keeping
  * them in this separate file is a better practice.
  *
- *	@method loadJS($js)
- *  @method loadCSS($js)
+ *	loadJS($js)
+ *  loadCSS($js)
  *
- *  @method evenOdd($i++)
- *  @method timeAgo(@time_stamp)
+ *  evenOdd($i++)
+ *  timeAgo(@time_stamp)
  *
 */
 
@@ -39,7 +39,7 @@ function evenOdd($number) {
 
 /**
  *  Time Ago
- *  @param some date
+ *  @param time_stamp|date $datetime
  *  @example timeAgo(@time_stamp);
  *  @example timeAgo(2019-05-01 00:22:35);
  *  @example timeAgo('2019-05-01 00:22:35', true);

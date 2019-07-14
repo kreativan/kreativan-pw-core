@@ -1,7 +1,19 @@
-/**
- *  Scroll To Top
- *
- */
+// Set active classes for element parents
+function setActiveParent() {
+    var classes = ".uk-navbar-dropdown-nav > li.uk-active, .uk-nav-sub > li.uk-active";
+    var active = document.querySelectorAll(classes);
+    if (active != null) {
+        active.forEach(e => {
+            var parent = e.closest("li.uk-parent");
+            parent.classList.add("uk-active");
+            console.log(parent);
+        });
+    }
+}
+setActiveParent();
+
+
+// Scroll To Top
 function scrollToTop() {
     window.addEventListener("scroll", function() {
         if(window.scrollY > 300) {
@@ -13,27 +25,10 @@ function scrollToTop() {
 }
 scrollToTop();
 
-/**
- *  Set active classes for element parents
- *
- */
-function setActiveParent() {
-    var classes = ".uk-navbar-dropdown-nav > li.uk-active, uk-nav-sub > li.uk-active";
-    var active = document.querySelector(classes);
-    if(active != null) {
-        var parent = active.closest("li.uk-parent");
-        parent.classList.add("uk-active");
-    }
-}
-setActiveParent();
 
-
-/**
- *  Form requierd elements
- *
- */
+// Form requierd elements
 function markRequiredForm() {
-    var formElements = document.querySelectorAll('input, textarea, select');
+    let formElements = document.querySelectorAll('input:not([type=checkbox]):not(.no-req), textarea:not(.no-req), select:not(.no-req)');
     formElements.forEach(e => {
 
         if(e.hasAttribute('required') == true) {
@@ -42,7 +37,7 @@ function markRequiredForm() {
             e.classList.add("tm-required");
 
             // if element is requerd change it's outerHTML
-            var newElement = "<div class='requierd-input uk-position-relative'>";
+            let newElement = "<div class='requierd-input uk-position-relative'>";
             newElement += "<span style='color:red;position:absolute;top:0px;right:5px;'>*</span>";
             newElement += e.outerHTML;
             newElement += "</div>";
@@ -108,5 +103,31 @@ function validateForm(formID) {
     //console.log(response)
 
     return response;
+
+}
+
+
+/**
+ *  Display modal confirm (UIkit)
+ *  It's just gonna prompt you "are you sure" and redirect to the href url
+ *  @example <a href="#" onclick="modalConfirm('Are you Sure?', 'My custom text here')">Example</a>
+ *  @param {string} q
+ *  @param {string} txt
+ *
+ */
+function modalConfirm(q, txt) {
+
+    event.preventDefault();
+    var e = event.target;
+    let href = e.getAttribute('href');
+    let question = (q != null) ? q : "Are you sure?";
+    let heading = `<div class="tm-modal-confirm-title uk-h2 uk-text-center uk-margin-remove">${question}</div>`;
+    let text = txt != null ? `<div class="tm-modal-confirm-text uk-text-center uk-margin-small-top">${txt}</div>` : "";
+
+    UIkit.modal.confirm(heading+text).then(function () {
+            window.location.replace(href);
+        }, function () {
+        // console.log('Rejected.')
+    });
 
 }

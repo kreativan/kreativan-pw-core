@@ -67,15 +67,12 @@ class SiteSettings extends Process {
      */
     public function hidePages(HookEvent $event){
 
-        // get module settings
-        $settings =  $this->modules->get("cmsCore");
-
         // get system pages
-        $sysPagesArr = $settings->sys_pages;
+        $sysPagesArr = $this->sys_pages;
 
         // aditional pages to hide by ID
         $customArr = [];
-        if($settings->hide_admin == "1") {
+        if($this->hide_admin == "1") {
             array_push($customArr, "2");
         }
 

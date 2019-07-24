@@ -16,7 +16,6 @@ include_once("./_lang.php");
 
 $home           = $pages->get("/");
 $site_settings  = $pages->get("template=system");
-$site_info      = $site_settings->site_info;
 
 /**
  *  We are passing this as a parametar
@@ -26,7 +25,6 @@ $site_info      = $site_settings->site_info;
 $global_vars = [
     "home" => $home,
     "site_settings" => $site_settings,
-    "site_info" => $site_settings->site_info,
 ];
 
 /**
@@ -36,6 +34,9 @@ $global_vars = [
  *
  */
 setting([
-    "email" => $site_settings->site_info->email,
-    "phone" => $site_settings->site_info->phone,
+    "site_name" => $site_settings->site_info->site_name,
+    "site_website" => $site_settings->site_info->website,
+    "site_email" => $site_settings->site_info->email,
+    "site_phone" => $site_settings->site_info->phone,
+    "site_address" => $site_settings->site_info->address,
 ]);

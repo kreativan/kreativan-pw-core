@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Module Selector Panel
- */
-
 class ModuleDisablerPanel extends BasePanel {
 
     protected $icon;
@@ -17,10 +13,10 @@ class ModuleDisablerPanel extends BasePanel {
         $this->disabledModules = empty(\TracyDebugger::$disabledModules) ? array() : \TracyDebugger::$disabledModules;
 
         if(count($this->disabledModules) > 0) {
-            $this->iconColor = '#CD1818';
+            $this->iconColor = \TracyDebugger::COLOR_WARN;
         }
         else {
-            $this->iconColor = '#009900';
+            $this->iconColor = \TracyDebugger::COLOR_NORMAL;
         }
 
         $this->icon = '
@@ -39,7 +35,6 @@ class ModuleDisablerPanel extends BasePanel {
             </span>
         ';
     }
-
 
 
     public function getPanel() {
@@ -133,7 +128,12 @@ class ModuleDisablerPanel extends BasePanel {
                         $out .= '<legend>There are no modules installed that can be disabled.</legend>';
                     }
                 }
-            $out .= '</fieldset>' . \TracyDebugger::generatedTimeSize('moduleDisabler', \Tracy\Debugger::timer('moduleDisabler'), strlen($out)) . '
+
+            $out .= '</fieldset>';
+
+            $out .= \TracyDebugger::generatePanelFooter('moduleDisabler', \Tracy\Debugger::timer('moduleDisabler'), strlen($out));
+
+        $out .= '
         </div>';
 
         return parent::loadResources() . $out;

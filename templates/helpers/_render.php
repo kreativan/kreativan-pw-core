@@ -108,7 +108,7 @@ function renderMenu($menu, $class = "") {
 /**
  *  Display UIkit alert
  *  @var string $style  primary/success/warning/danger
- *  @var string $text  
+ *  @var string $text
  *
  */
 function renderAlert($style = "primary", $text = "") {
@@ -136,11 +136,13 @@ function renderButton($b, $class = "") {
 	$button = "";
 
 	$class = !empty($class) ? $class : "";
+
    	// attributes
    	$attr = "";
    	$attr .= ($b->link_attr[1]) ? " target='_blank'" : "";
    	$attr .= ($b->link_attr[2]) ? " rel='nofollow'" : "";
    	$attr .= " title='$b->title'";
+
    	// href
    	$href = "#";
    	if($b->link_type == '2') {
@@ -148,10 +150,12 @@ function renderButton($b, $class = "") {
    	} elseif($b->link_type == '1') {
 	   $href = $b->link;
    	}
+
    	// style
    	$style = "uk-button-{$b->button_style->title}";
 	if(!empty($b->title)) {
 		$button = "<a class='uk-button $style $class' href='$href' $attr>$b->title</a>";
 	}
+    
    	return $button;
 }

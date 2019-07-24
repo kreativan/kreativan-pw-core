@@ -3,13 +3,12 @@
 	<footer id="footer" class="uk-background-secondary uk-light uk-padding-large uk-text-center">
 		<div class="uk-container">
 
-			<!-- scroll to top -->
 			<a class="uk-animation-slide-bottom uk-visible@l" href="#" uk-totop uk-scroll></a>
 
 			<p>
 				<?php
-					$site_name = $site_info->site_name;
-					$website = "<a href='{$site_info->website}'>$site_name</a>";
+					$site_name = $site_settings->site_info->site_name;
+					$website = "<a href='{$site_settings->site_info->website}'>$site_name</a>";
 					$copyright = str_replace("{{date}}", date("Y"), $site_settings->text);
 					$copyright = str_replace("{{site_name}}", $site_name, $copyright);
 					$copyright = str_replace("{{website}}", $website, $copyright);
@@ -20,13 +19,20 @@
 		</div>
 	</footer>
 
-</div> <!-- wrapper end -->	
+</div> <!-- wrapper end -->
 
-<?php
-	if(!empty($system->google_analytics)) {
-		echo $system->google_analytics;
-	}
-?>
+<div id="mobile-menu" uk-offcanvas="overlay: true">
+  	<div class="uk-offcanvas-bar">
+	  	<button class="uk-offcanvas-close" type="button" uk-close></button>
+	  	<div class="uk-margin-large-top">
+		  	<!--
+
+			  	add your mobile menu here
+
+		  	-->
+	  	</div>
+	</div>
+</div>
 
 <?php
     // Dynamic js/css files
@@ -36,7 +42,13 @@
     foreach($config->scripts->unique() as $file) {
     	echo "<script type='text/javascript' src='$file'></script>";
     }
-  ?>
+?>
+
+<?php
+	if(!empty($site_settings->google_analytics)) {
+		echo $site_settings->google_analytics;
+	}
+?>
 
 </body>
 </html>

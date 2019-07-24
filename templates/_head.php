@@ -24,9 +24,6 @@
 	<!-- main js -->
 	<script defer type='text/javascript' src='<?=  $config->urls->templates . 'lib/main.js' ; ?>'></script>
 
-    <!-- Google Maps -->
-    <script defer src="https://maps.googleapis.com/maps/api/js?key=<?= $modules->get("FieldtypeMapMarker")->googleApiKey ?>&callback=initMap"></script>
-
 	<?php
 		// SeoMaestro
 		echo $page->seo;
@@ -37,7 +34,9 @@
 <body>
 
 <div id="mobile-header" class="uk-hidden@m">
-	<a class="mobile-menu-button" href="#mobile-menu" uk-toggle><span uk-icon="icon: menu"></span></a>
+	<a class="mobile-menu-button" href="#mobile-menu" uk-toggle>
+		<span uk-icon="icon: menu"></span>
+	</a>
 	<a class="logo" href="<?= $pages->get("/")->url ?>">
 		<?php if(!empty($site_settings->logo)) :?>
 			<img src="<?= $site_settings->logo->url ?>" alt="logo" />

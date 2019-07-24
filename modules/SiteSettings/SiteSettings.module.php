@@ -61,41 +61,43 @@ class SiteSettings extends Process {
 
     }
 
-
-    /**
-    *  Intercept page tree json and remove page from it
-    *  We will remove page by its template
-    *
-    */
+	/**
+     *  Intercept page tree json and remove page from it
+     *  We will remove page by its template
+     */
     public function hidePages(HookEvent $event){
 
+        // get module settings
+        $settings =  $this->modules->get("cmsCore");
+
         // get system pages
-        $sysPagesArr = !empty($this->sys_pages) ? $this->sys_pages : [];
+        $sysPagesArr = $settings->sys_pages;
 
         // aditional pages to hide by ID
         $customArr = [];
-        if($this->hide_admin == "1") {
-           array_push($customArr, "2");
+        if($settings->hide_admin == "1") {
+            array_push($customArr, "2");
         }
 
         if($this->config->ajax) {
 
             // manipulate the json returned and remove any pages found from array
             $json = json_decode($event->return, true);
-            foreach($json['children'] as $key => $child){
-                $c = $this->pages->get($child['id']);
-                $pagetemplate = $c->template;
-                if(in_array($pagetemplate, $sysPagesArr) || in_array($c, $customArr)) {
-                    unset($json['children'][$key]);
+            if($json) {
+                foreach($json['children'] as $key => $child){
+                    $c = $this->pages->get($child['id']);
+                    $pagetemplate = $c->template;
+                    if(in_array($pagetemplate, $sysPagesArr) || in_array($c, $customArr)) {
+                        unset($json['children'][$key]);
+                    }
                 }
+                $json['children'] = array_values($json['children']);
+                $event->return = json_encode($json);
             }
-            $json['children'] = array_values($json['children']);
-            $event->return = json_encode($json);
 
         }
 
     }
-
 
 	/**
 	 * Called only when your module is installed

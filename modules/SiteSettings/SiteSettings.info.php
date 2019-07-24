@@ -69,6 +69,6 @@ $info = array(
     // and the file: /wire/core/Module.php
 
     'singular' => true,
-    'autoload' => true,
+    'autoload' => false,
 
 );

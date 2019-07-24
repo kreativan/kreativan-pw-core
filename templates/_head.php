@@ -23,6 +23,9 @@
 
 	<!-- main js -->
 	<script defer type='text/javascript' src='<?=  $config->urls->templates . 'lib/main.js' ; ?>'></script>
+	
+	<!-- Google Maps -->
+    <script defer src="https://maps.googleapis.com/maps/api/js?key=<?= $modules->get("FieldtypeMapMarker")->googleApiKey ?>&callback=initMap"></script>
 
 	<?php
 		// SeoMaestro

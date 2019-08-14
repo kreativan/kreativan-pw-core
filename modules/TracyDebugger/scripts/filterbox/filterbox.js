@@ -1,6 +1,6 @@
 /**
- * FilterBox v0.4.92
- * 2019/07/15
+ * FilterBox v0.4.97
+ * 2019/08/05
  */
 (function (window, document) {
     "use strict";
@@ -114,13 +114,15 @@
             beforeDestroy = setCb("beforeDestroy"),
             afterDestroy = setCb("afterDestroy"),
             enableObserver = o.enableObserver === true,
+            autoFilter = o.autoFilter !== false,
             hideSelector,
             hl = o.highlight || false,
             hlTag = hl && hl.tag ? hl.tag : "fbxhl",
             hlClass = "on" + suffix,
             hlStyle = hl && hl.style ? hlTag + "." + hlClass + "{" + hl.style + "}" : "",
             hlMinChar = hl && hl.minChar ? hl.minChar : 2,
-            hiddenStyle = "[" + hideAttr + '="1"]' + "{display:none}",
+            hideRule = o.hideRule || "display: none !important;",
+            hiddenStyle = "[" + hideAttr + '="1"]' + "{" + hideRule + "}",
             init = false,
             initTableColumns = false,
             observer,
@@ -132,6 +134,40 @@
                 "ESCAPE": 27,
                 "ENTER": 13
             };
+
+        self.getSettings = function () {
+            return {
+                autoFilter: autoFilter,
+                enableObserver: enableObserver,
+                highlight: hl,
+                highlightMinChar: hlMinChar,
+                highlightTag: hlTag,
+                inputDelay: inputDelay,
+                keyNav: keyNav,
+                keyNavAutoSelectFirst: keyNavAutoSelectFirst,
+                lazy: lazy,
+                separator: SEPARATOR,
+                suffix: suffix,
+                zebra: zebra,
+                attributes: {
+                    extraFilterAttrs: extraFilterAttrs,
+                    filterAttr: filterAttr,
+                    hasFilterAttr: hasFilterAttr,
+                    hideAttr: hideAttr,
+                    highlightClass: hlClass,
+                    invertAttr: invertAttr,
+                    keyNavClass: keyNavClass,
+                    keyNavStyle: keyNavStyle,
+                    noMatchAttr: noMatchAttr,
+                    styleId: styleId,
+                    zebraAttr: zebraAttr
+                },
+                elements: {
+                    $target: $target,
+                    $input: $input
+                },
+            };
+        };
 
         function getItems() {
             return $target.querySelectorAll(items);
@@ -162,6 +198,14 @@
 
         self.getInput = function () {
             return $input;
+        };
+
+        self.getDisplay = function (name) {
+            for (var i = 0; i < $displays.length; i++) {
+                if ($displays[i].name === name) {
+                    return $displays[i].el;
+                }
+            }
         };
 
         function unwrap(wrapper) {
@@ -265,8 +309,8 @@
             return self.count(self.getFilter());
         };
 
-        self.enableHighlight = function (bool) {
-            hl = bool === false;
+        self.enableHighlight = function (enable) {
+            hl = enable;
         };
 
         self.setZebra = function () {
@@ -282,10 +326,10 @@
             }
         };
 
-        self.filter = function (v) {
+        self.filter = function (v, force) {
             $input.value = v;
             handleFocus(null, false);
-            handleInput();
+            handleInput(force);
             return self;
         };
 
@@ -430,7 +474,21 @@
 
         self.updateDisplays = function () {
             for (var i = 0; i < $displays.length; i++) {
-                $displays[i].el.innerHTML = $displays[i].text.call(self);
+                var $display = $displays[i],
+                    text = $displays[i].text,
+                    showIf = $displays[i].showIf;
+
+                if (text) {
+                    if (typeof text === "function") {
+                        $display.el.innerHTML = $displays[i].text.call(self);
+                    } else {
+                        $display.el.innerHTML = text;
+                    }
+                }
+
+                if (showIf && typeof showIf === "function") {
+                    $display.el.style.display = showIf.call(self) ? "" : "none";
+                }
             }
         };
 
@@ -507,18 +565,19 @@
                     $addTo = d.addTo && d.addTo.selector ? document.querySelector(d.addTo.selector) : $target,
                     position = d.addTo && d.addTo.position || "before",
                     tag = d.tag || "div",
-                    text = d.text && typeof d.text === "function" ? d.text : false;
+                    text = d.text || "",
+                    showIf = d.showIf,
+                    $display = document.createElement(tag);
 
-                if (text) {
-                    var $display = document.createElement(tag);
-                    setAttrs($display, d.attrs);
-                    insertDom($display, $addTo, position);
+                setAttrs($display, d.attrs);
+                insertDom($display, $addTo, position);
 
-                    $displays.push({
-                        el: $display,
-                        text: text
-                    });
-                }
+                $displays.push({
+                    name: k,
+                    el: $display,
+                    text: text,
+                    showIf: showIf
+                });
             }
             self.updateDisplays();
         }
@@ -808,10 +867,12 @@
             }
         }
 
-        function handleInput() {
+        function handleInput(force) {
             var v = self.getFilter().toLowerCase().trim(),
                 count,
                 invert = false;
+
+            if (!autoFilter && !force) return false;
 
             dehighlight();
             self.removeKeyNavClass();
@@ -842,7 +903,7 @@
             } else {
                 hideSelector = invert ? self.getVisibleSelector(v) : self.getHiddenSelector(v);
 
-                setStyles(hideSelector + "{display:none}");
+                setStyles(hideSelector + "{" + hideRule + "}");
 
                 // need to get non-visible items too, parent may be hidden
                 count = self.countVisible();

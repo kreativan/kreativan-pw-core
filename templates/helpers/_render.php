@@ -4,7 +4,6 @@
  *
  *  renderPagination()
  *  renderBreadcrumb()
- *  renderMenu(
  *	renderAlert()
  *	renderButton()
  *
@@ -59,49 +58,6 @@ function renderBreadcrumb($align = "center") {
     $breadcrumb .= "</ul>";
 
     return $breadcrumb;
-}
-
-/**
- *  Menu - Nav
- *
- *  @param Field $menu repeater
- *  @param string $class uikit nav class
- *
- */
-function renderMenu($menu, $class = "") {
-
-    $menu_nav = "";
-    $menu_nav .= "<ul class='uk-nav $class'>";
-        foreach($menu as $nav) {
-
-            $active_cls = "";
-
-            // attributes
-            $attr = "";
-            $attr .= ($nav->link_attr[1]) ? " target='_blank'" : "";
-            $attr .= ($nav->link_attr[2]) ? " rel='nofollow'" : "";
-
-            // href
-            $href = "#";
-            if($nav->link_type->title == "default") {
-
-                $href = $nav->link;
-
-            } elseif($nav->link_type->title == "page" && !empty($nav->select_page)) {
-
-                $href = $nav->select_page->url;
-
-                $active_cls = (wire('page')->id == $nav->select_page->id) ? "class='uk-active'" : "";
-
-            }
-
-            $menu_nav .= "<li {$active_cls}><a href='$href' $attr>$nav->title</a></li>";
-
-        }
-    $menu_nav .= "</ul>";
-
-    return $menu_nav;
-
 }
 
 

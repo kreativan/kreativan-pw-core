@@ -1,0 +1,156 @@
+:root {
+    --border: #ddd;
+    --border-light: #f0f0f0;
+}
+
+/* =========================================================== 
+    Hide Stuff
+=========================================================== */
+.ProcessPageEdit-template-system #_ProcessPageEditDelete,
+.ProcessPageEdit-template-system #_ProcessPageEditChildren {
+    display: none;
+}
+
+/* =========================================================== 
+    Utility
+=========================================================== */
+
+.ivm-border {
+    border: 1px solid var(--border);
+}
+.ivm-border-light {
+    border: 1px solid var(--border-light);
+}
+
+/* =========================================================== 
+    Table
+=========================================================== */
+
+.ivm-tabs + .ivm-border {
+    border-top:0;
+}
+
+.ivm-table tr:last-child,
+.ivm-table tr:last-child td {
+    border-bottom: 0 !important;
+}
+
+.ivm-table th {
+    font-size:13px;
+}
+
+.ivm-table td:last-child > a:hover {
+    text-decoration: none;
+}
+
+
+.ivm-table i {
+    font-size:18px;
+}
+
+a.ivm-is-unpublished,
+tr.ivm-is-unpublished a {
+    text-decoration: line-through;
+    color:#888;
+}
+
+a.ivm-is-hidden,
+tr.ivm-is-hidden *:not(option):not(select) {
+    color:#888;
+}
+
+
+tr.ivm-is-hidden .fa-toggle-on:before {
+    content: "\f204";
+}
+
+td a:hover {
+    text-decoration:none;
+}
+
+td .ivm-ajax-button {
+    display:inline-block;
+    width: 35px;
+    text-align:center;
+}
+
+
+
+/* =========================================================== 
+    Sortable Table
+=========================================================== */
+
+.handle {
+    padding:0 10px;
+    cursor: grab;
+    cursor: -webkit-grab;
+}
+
+.ui-sortable-helper .handle {
+    cursor: move;
+}
+
+.ui-sortable-helper {
+    background: #fff;
+    border:1px solid #ddd;
+    box-shadow: 0px 5px 25px rgba(0, 0, 0, 0.1);
+    width:100%;
+}
+
+#sortable a > .fa {
+    font-size:20px;
+}
+
+#sortable a:hover > .fa,
+#sortable a:hover {
+    text-decoration: none;
+}
+
+.ui-sortable-helper > td:not(:first-child):not(:nth-child(2)) {
+    display:none;
+}
+
+/* =========================================================== 
+    Actions
+=========================================================== */
+.ivm-actions {
+    position:relative;
+    z-index:99;
+}
+
+.ivm-actions a {
+    margin-left:5px;
+}
+
+.uk-card .ivm-actions a {
+    margin-left: 0;
+}
+
+.ivm-actions--circle a i {
+     font-size:14px !important;
+}
+
+.ivm-actions--circle a {
+    display:inline-block;
+    box-sizing:border-box;
+    width:28px;
+    height:28px;
+    line-height:25px;
+    border:1px solid transparent;
+    border-radius: 50%;
+    text-align: center;
+    font-size:15px;
+    background: #3EB998;
+    color: #fff;
+}
+
+.ivm-actions--circle a[data-action="trash"],
+.ivm-is-hidden .ivm-actions--circle a {
+    color: #888;
+    background: white;
+    border:1px solid #ddd;
+}
+
+.ivm-actions--circle a[data-action="trash"]:hover {
+    color: #BC283D;
+}

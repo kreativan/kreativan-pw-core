@@ -65,11 +65,14 @@
 			</div>
 
 			<div id="navbar" class="uk-width-expand uk-margin-left">
-				<!--
-
-						add your navbar - main menu here
-
-				-->
+				<nav class="uk-navbar-container" uk-navbar>
+					<div class="uk-navbar-right">
+						<?php  
+							$main_menu = $pages->get("/system/main-menu/")->children("include=hidden, sort=sort");
+							echo renderNavbarMenu($main_menu, setting("show_home"));
+						?>
+					</div>
+				</nav>
 			</div>
 
 		</div>

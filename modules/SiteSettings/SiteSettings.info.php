@@ -69,6 +69,6 @@ $info = array(
     // and the file: /wire/core/Module.php
 
     'singular' => true,
-    'autoload' => true, // need it for hide pages
+    'autoload' => false, // need it for hide pages
 
 );

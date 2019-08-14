@@ -61,7 +61,7 @@
                             }
                         }
                     ?>
-                    <?= ($item->link_block->link_type == '3') ? "<em>{$item->link_block->link}</em>" : ""; ?>
+                    <?= ($item->link_block->link_type == "1") ? "<em>{$item->link_block->link}</em>" : ""; ?>
                 </td>
 
                 <td class="uk-text-center uk-text-muted uk-visible@m">

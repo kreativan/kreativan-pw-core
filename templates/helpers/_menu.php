@@ -25,21 +25,19 @@ function getLinkOptions($menu) {
     $class .= ($menu->menu && $menu->menu->count) ? " uk-parent" : "";
 
     // link_type + href + attr
-    if($link_type != "1") {
-        if($link_type == "2" && !empty($page_link)) {
-            $p = wire("pages")->get("id=$page_link");
-            $href = $p->url;
-            $class .= ($p->id == wire("page")->id) ? "uk-active" : "";
-        }else {
-            $href = $link;
-            $attr .= ($link_attr[1]) ? " target='_blank'" : "";
-            $attr .= ($link_attr[2]) ? " rel='nofollow'" : "";
-            $attr .= ($link_attr[3]) ? " uk-toggle" : "";
-            // scroll
-            $attr .= (wire("page") == $home && $link_attr[4]) ? " uk-scroll" : "";
-            // if not home go to home page and scroll
-            $href = (wire("page") != $home && $link_attr[4]) ? "{$home->url}{$link}" : $href;
-        }
+    if ($link_type == "2" && !empty($page_link)) {
+        $p = wire("pages")->get("id=$page_link");
+        $href = $p->url;
+        $class .= ($p->id == wire("page")->id) ? "uk-active" : "";
+    } else {
+        $href = $link;
+        $attr .= ($link_attr[1]) ? " target='_blank'" : "";
+        $attr .= ($link_attr[2]) ? " rel='nofollow'" : "";
+        $attr .= ($link_attr[3]) ? " uk-toggle" : "";
+        // scroll
+        $attr .= (wire("page") == $home && $link_attr[4]) ? " uk-scroll" : "";
+        // if not home go to home page and scroll
+        $href = (wire("page") != $home && $link_attr[4]) ? "{$home->url}{$link}" : $href;
     }
 
     // link title attr

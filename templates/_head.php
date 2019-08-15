@@ -51,7 +51,7 @@
 
 <div id="wrapper" class="uk-offcanvas-content">
 
-	<section id="header" class="uk-section-muted uk-visible@m">
+	<div id="header" class="uk-section-muted uk-visible@m">
 		<div class="uk-container uk-flex uk-flex-middle">
 
 			<div id="logo" class="logo uk-width-auto">
@@ -76,4 +76,4 @@
 			</div>
 
 		</div>
-	</section>
+	</div>

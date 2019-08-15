@@ -34,7 +34,7 @@
 
 </head>
 
-<body>
+<body class="<?= $page->template ?>-tmpl">
 
 <div id="mobile-header" class="uk-hidden@m">
 	<a class="mobile-menu-button" href="#mobile-menu" uk-toggle>

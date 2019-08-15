@@ -51,29 +51,31 @@
 
 <div id="wrapper" class="uk-offcanvas-content">
 
-	<div id="header" class="uk-section-muted uk-visible@m">
-		<div class="uk-container uk-flex uk-flex-middle">
+	<div id="header" class="uk-visible@m">
+		<div id="navbar" uk-sticky="show-on-up: true; animation: uk-animation-slide-top;">
+			<div class="uk-container">
+				<nav class="uk-navbar-container" uk-navbar="boundary: body">
 
-			<div id="logo" class="logo uk-width-auto">
-				<?php if(!empty($site_settings->logo)) :?>
-					<a href="<?= $pages->get(1)->url ?>">
-						<img src="<?= $site_settings->logo->url ?>" alt="logo" />
-					</a>
-				<?php else :?>
-					<h3 class="uk-margin-remove"><?= setting("site_name"); ?></h3>
-				<?php endif;?>
-			</div>
+					<div class="uk-navbar-left">
+						<div id="logo" class="logo uk-width-auto">
+							<?php if(!empty($site_settings->logo)) :?>
+								<a href="<?= $pages->get(1)->url ?>">
+									<img src="<?= $site_settings->logo->url ?>" alt="logo" />
+								</a>
+							<?php else :?>
+								<h3 class="uk-margin-remove"><?= setting("site_name"); ?></h3>
+							<?php endif;?>
+						</div>
+					</div>
 
-			<div id="navbar" class="uk-width-expand uk-margin-left">
-				<nav class="uk-navbar-container" uk-navbar>
-					<div class="uk-navbar-right">
+					<div class="uk-navbar-center">
 						<?php  
 							$main_menu = $pages->get("/system/main-menu/")->children("include=hidden, sort=sort");
 							echo renderNavbarMenu($main_menu, setting("show_home"));
 						?>
 					</div>
+
 				</nav>
 			</div>
-
 		</div>
 	</div>

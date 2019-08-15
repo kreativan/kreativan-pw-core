@@ -9,9 +9,6 @@
  *
 */
 
-// New
-$new_item_link = "{$page->url}new";
-
 ?>
 
 
@@ -38,7 +35,7 @@ $new_item_link = "{$page->url}new";
     <?php endif;?>
 
     <?php if($items_trash->count > 0) :?>
-        <li>
+        <li class="<?= ($page_name == "trash") ? "uk-active" : ""; ?>">
             <a href="./trash/">
                 <i class="fa fa-trash"></i>
                 <?= __("Trash"); ?> 

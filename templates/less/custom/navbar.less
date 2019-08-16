@@ -18,6 +18,25 @@
 
 @navbar-nav-item-text-transform:                uppercase;
 
+//  Dropdown
+@navbar-dropdown-z-index:                       @global-z-index + 20;
+@navbar-dropdown-width:                         250px;
+@navbar-dropdown-margin:                        13px;
+@navbar-dropdown-padding:                       25px;
+@navbar-dropdown-background:                    @global-muted-background;
+
+@navbar-dropdown-nav-item-color:                @global-emphasis-color;
+@navbar-dropdown-nav-item-hover-color:          @global-primary-background;
+@navbar-dropdown-nav-item-active-color:         @global-primary-background;
+
 /* ===================================================================================
     navbar
 ==================================================================================== */
+
+.uk-navbar-dropdown {
+
+    animation-duration: .3s !important;
+    animation-name: uk-fade-bottom-small;
+    top: @navbar-nav-item-height !important;
+
+}

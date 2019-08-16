@@ -3,51 +3,58 @@
 =========================================================== */
 
 /**
-*  Gradient Hover Mixin
-*  because gradients doesnt support css transitions...
-*  Great for buttons...
+ *  Gradient Hover Mixin
+ *  because gradients doesnt support css transitions...
+ *  Great for buttons...
 */
 .gradient-hover-mixin(@bg-1, @bg-2, @deg: 90deg) {
 
-       background: transparent;
-       z-index:1;
+    @transition: opacity .6s;
 
-       &:after,
-       &:before {
-           content: "";
-           display:block;
-           position:absolute;
-           width:100%;
-           height:100%;
-           top:0;
-           left:0;
-           right:0;
-           bottom:0;
-           background: linear-gradient(
-               @deg,
-               @bg-1,
-               @bg-2
-           );
-           z-index:-1;
-           border-radius: @tm-border-radius;
-           transition: opacity .3s;
-           opacity:0;
-       }
+    background: @bg-2;
+    z-index:1;
 
-       &:before {
-           background: linear-gradient(
-               @deg,
-               @bg-2,
-               @bg-1
-           );
-           opacity:1;
-       }
+    &:after,
+    &:before {
+        content: "";
+        display:block;
+        position:absolute;
+        width:100%;
+        height:100%;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        background: linear-gradient(
+            @deg,
+            @bg-1,
+            @bg-2
+        );
+        z-index:-2;
+        border-radius: @tm-border-radius;
+        transition: @transition;
+        opacity:0;
+    }
 
-       &:hover:before {
-           opacity:0;
-       }
-       &:hover:after {
-           opacity:1;
-       }
+    &:before {
+        background: linear-gradient(
+            @deg,
+            @bg-2,
+            @bg-1
+        );
+        opacity:1;
+        z-index:-1;
+    }
 
-   }
+    &:hover:before {
+        opacity:0;
+        z-index:-2;
+        transition: @transition;
+    }
+    &:hover:after {
+        opacity:1;
+        z-index:-1;
+        transition: @transition;
+    }
+
+}

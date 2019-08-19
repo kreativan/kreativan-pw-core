@@ -10,7 +10,7 @@
 
 ?>
 
-<table class="ivm-table uk-table uk-table-striped uk-table-middle uk-margin-remove">
+<table class="ivm-table uk-table uk-table-striped uk-table-middle uk-table-small uk-margin-remove">
 
     <thead>
         <tr>

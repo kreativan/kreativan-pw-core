@@ -12,6 +12,7 @@
 
 include_once("./_lang.php");
 include_once("./helpers/_func.php");
+include_once("./helpers/_helpers.php");
 include_once("./helpers/_render.php");
 include_once("./helpers/_menu.php");
 

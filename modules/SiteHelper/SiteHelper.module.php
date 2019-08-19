@@ -377,5 +377,31 @@ class SiteHelper extends WireData implements Module {
         $this->session->redirect($goto);
 
     }
+	
+	/**
+     *  render Table Actions
+     *
+     */
+    public function tableActions($item) {
+
+        $actions = "
+            <a href='#' class='ivm-ajax-button' title='Publish/Unpublish' uk-tooltip
+                data-id='$item->id'
+                data-action='publish'
+            >
+                <i class='fa fa-toggle-on'></i>
+            </a>
+
+            <a href='#' class='ivm-ajax-button' title='Trash' uk-tooltip
+                data-id='$item->id'
+                data-action='trash'
+            >
+                <i class='fa fa-close'></i>
+            </a>
+        ";
+
+        return $actions;
+
+    }
 
 }

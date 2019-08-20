@@ -1,0 +1,243 @@
+<?php namespace ProcessWire;
+
+/**
+ * ProcessWire ProFields Repeater Matrix Inputfield
+ *
+ * THIS IS A COMMERCIAL MODULE: DO NOT DISTRIBUTE.
+ * This file should NOT be uploaded to GitHub or available for download on any public site.
+ *
+ * Copyright 2017 by Ryan Cramer
+ * ryan@processwire.com
+ * 
+ * PWPFRMI
+ *
+ *
+ */
+
+class InputfieldRepeaterMatrix extends InputfieldRepeater implements InputfieldItemList {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => __('ProFields: Repeater Matrix Inputfield', __FILE__), // Module Title
+			'summary' => __('Commercial module (Inputfield) providing multi-type repeaters.', __FILE__), // Module Summary
+			'version' => 4,
+			'requires' => 'FieldtypeRepeaterMatrix',
+			);
+	}
+
+	/**
+	 * Set config defaults
+	 *
+	 */
+	public function __construct() {
+		parent::__construct();
+	}
+
+	/**
+	 * Initialize the repeaters inputfield
+	 *
+	 */
+	public function init() {
+		parent::init();
+	}
+
+	/**
+	 * Render the repeater label
+	 * 
+	 * @param string $label Label
+	 * @param int $cnt Item index (1-based)
+	 * @param Page $page Repeater item
+	 * @return string
+	 *
+	 */
+	public function ___renderRepeaterLabel($label, $cnt, Page $page) {
+		
+		$type = $page->get('repeater_matrix_type'); 
+		if(is_null($type)) return parent::___renderRepeaterLabel($label, $cnt, $page);
+		$languages = $this->wire('languages');
+		
+		if(!$page->id) {
+			// non-editable new item
+			$out = '{matrix_label} [• ' . $this->_('This item will become editable after you save.') . ']';
+		} else if($page->isUnpublished() && $page->hasStatus(Page::statusOn)) {
+			// editable new item
+			$out = '{matrix_label} [• ' . $this->_('New') . ']';
+		} else {
+			$out = $this->field->get("matrix{$type}_head");
+			if(!$out) $out = "{matrix_label} [• {matrix_summary}]";
+		}
+	
+		if(strpos($out, '{matrix_label}') !== false) {
+			$label = '';
+			if($languages) {
+				$language = $this->wire('user')->language;
+				if($language && !$language->isDefault()) {
+					$label = $this->field->get("matrix{$type}_label$language->id");
+				}
+			}
+			if(!$label) $label = $this->field->get("matrix{$type}_label");
+			if(!$label) $label = $this->field->get("matrix{$type}_name");
+			$out = str_replace('{matrix_label}', $label, $out);
+		}
+	
+		if(strpos($out, '{matrix_summary}') !== false) {
+			if(method_exists($page, 'summarize')) {
+				$summary = $page->summarize();
+				$summary = str_replace(array('{', '}'), ' ', $summary);
+			} else {
+				$summary = $page->className();	
+			}
+			$out = str_replace('{matrix_summary}', $summary, $out);
+		}
+		
+		$pos1 = strpos($out, '[');
+		$pos2 = strpos($out, ']');
+
+		if(strpos($out, '{') !== false) {
+			$out = $this->wire('sanitizer')->text($page->getMarkup($out));
+		}
+		
+		if(!$out) $out = $this->field->get("matrix{$type}_label");
+		if(!$out) $out = $this->field->get("matrix{$type}_name");
+		
+		if(mb_strlen($out) > 128) {
+			$out = mb_substr($out, 0, 128);
+			if(preg_match('/^(.+)[\s,;]\w*$/', $out, $matches)) {
+				$out = $matches[1];
+			}
+			if($pos1 !== false && $pos2 > $pos1) {
+				$pos1 = strpos($out, '['); // make sure it's still there
+				if($pos1 !== false && $pos2 > $pos1 && strpos($out, ']') !== $pos2) {
+					// add back deemphasis bracket that was stripped by substr
+					$out .= ']';
+				}
+			}
+		}
+
+		$out = str_replace(array('{', '}'), ' ', $out);
+		if($pos1 !== false) {
+			if($pos2 > $pos1) {
+				$out = str_replace(array('[', ']'), array('{', '}'), $out); // for de-emphasis
+				$out = str_replace('{}', '', $out);
+				$out = rtrim($out, '• ');
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Get the repeater item type (if used)
+	 *
+	 * @param Page $page
+	 * @return int
+	 *
+	 */
+	protected function getRepeaterItemType(Page $page) {
+		return $page->get('repeater_matrix_type');
+	}
+
+	/**
+	 * Get InputfieldWrapper for repeater item
+	 * 
+	 * @param Page $page
+	 * @return InputfieldWrapper
+	 * 
+	 */
+	protected function getRepeaterItemInputfields(Page $page) {
+		$namespace = "matrix" . $this->getRepeaterItemType($page);
+		$fieldIDs = $this->field->get($namespace . "_fields");
+		if(is_null($fieldIDs)) return new InputfieldWrapper();
+		$inputfields = $page->template->fieldgroup->getPageInputfields($page, "_repeater{$page->id}", $fieldIDs, $namespace);
+		return $inputfields;
+	}
+
+	/**
+	 * Called before Inputfield::render
+	 * 
+	 * @param Inputfield $parent
+	 * @param bool $renderValueMode
+	 * @return bool
+	 * 
+	 */
+	public function renderReady(Inputfield $parent = null, $renderValueMode = false) {
+		$this->addClass('InputfieldRepeater', 'wrapClass');
+		$this->wire('modules')->loadModuleFileAssets('InputfieldRepeater');
+		return parent::renderReady($parent, $renderValueMode);
+	}
+
+	/**
+	 * Get the next repeater ready page
+	 * 
+	 * @param array $notIDs
+	 * @return Page
+	 * 
+	 */
+	protected function getNextReadyPage(array $notIDs) {
+		$readyPage = parent::getNextReadyPage($notIDs);
+		$type = $this->wire('input')->get('repeater_add');
+		if(!is_null($type)) {
+			$readyPage->setAndSave('repeater_matrix_type', (int) $type);
+		}
+		return $readyPage;
+	}
+
+	/**
+	 * Render the footer of the repeater items, which is the "add new" item section
+	 * 
+	 * @param string $noAjaxAdd Value is '1' if AJAX-adding is disallowed, or blank if it's allowed
+	 * @return string
+	 * 
+	 */
+	protected function renderFooter($noAjaxAdd) {
+		
+		$addLabel = $this->renderAddLabel();
+		$spinner =
+			"<i class='InputfieldRepeaterSpinner fa fa-fw fa-angle-double-right' " .
+			"data-on='fa-spin fa-spinner' data-off='fa-angle-double-right'></i>";
+
+		$out =
+			"<p class='InputfieldRepeaterAddItem InputfieldRepeaterMatrixAddItem'>" .
+			"<input class='InputfieldRepeaterAddItemsQty InputfieldRepeaterMatrixAddItemsQty' " . 
+				"type='text' data-name='_{$this->name}_add_items' value='0' />" . // noAjaxAdd
+			"<span class='ui-priority-secondary'>$addLabel $spinner</span> ";
+
+		$order = array();
+		/** @var FieldtypeRepeaterMatrix $fieldtype */
+		$fieldtype = $this->field->type;
+
+		for($n = 0; $n <= $fieldtype->getMaxMatrixTypes($this->field); $n++) {
+			if(!$this->field->get("matrix{$n}_name")) continue;
+			$sort = $this->field->get("matrix{$n}_sort");
+			while(isset($order[$sort])) $sort++;
+			$order[$sort] = $n;
+		}
+
+		ksort($order);
+
+		foreach($order as $sort => $n) {
+			$name = $this->field->get("matrix{$n}_name");
+			$label = $this->field->get("matrix{$n}_label");
+			if(!$label) $label = $name;
+			$label = $this->wire('sanitizer')->entities($label);
+
+			$out .=
+				"<a href='#' data-type='$n' data-label='$label' data-noajax='$noAjaxAdd' " . 
+					"class='InputfieldRepeaterAddLink InputfieldRepeaterMatrixAddLink'>" .
+				"<i class='fa fa-plus-circle'></i>&nbsp;$label</a> &nbsp; ";
+		}
+
+		$out .= "</p>"; // .InpufieldRepeaterAddItem
+		
+		return $out; 
+	}
+
+	/**
+	 * Render the repeater items
+	 *
+	 */
+	public function ___render() {
+		return parent::___render();
+	}
+
+}

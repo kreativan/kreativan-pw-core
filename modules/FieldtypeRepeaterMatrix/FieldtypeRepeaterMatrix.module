@@ -1,0 +1,216 @@
+<?php namespace ProcessWire;
+
+/**
+ * ProcessWire ProFields Repeater Matrix Fieldtype
+ * 
+ * THIS IS A COMMERCIAL MODULE: DO NOT DISTRIBUTE.
+ * This file should NOT be uploaded to GitHub or available for download on any public site.
+ *
+ * Copyright 2017 by Ryan Cramer
+ * ryan@processwire.com
+ * 
+ * PWPFRMF
+ * 
+ * @todo Update to prevent creating group names that collide with field names
+ * @todo add documentation for adding items via API
+ *
+ */
+
+class FieldtypeRepeaterMatrix extends FieldtypeRepeater implements ConfigurableModule {
+
+	public static function getModuleInfo() {
+		return array(
+			'title' => __('ProFields: Repeater Matrix', __FILE__), // Module Title
+			'summary' => __('Commercial module (Fieldtype) providing multi-type repeaters.', __FILE__), // Module Summary
+			'version' => 4,
+			'autoload' => false,
+			'installs' => 'InputfieldRepeaterMatrix',
+			'requires' => 'ProcessWire>=3.0.5, FieldtypeRepeater>=104'
+			);
+	}
+	
+	public function __construct() {
+		parent::__construct();
+		$this->wire('modules')->get('FieldtypeRepeater');
+		// todo: move this to store repeatersRootPageID natively in this module
+		$configData = $this->wire('modules')->getModuleConfigData('FieldtypeRepeater');
+		$this->set('repeatersRootPageID', $configData['repeatersRootPageID']);
+		require_once(__DIR__ . '/RepeaterMatrixPage.php');
+		require_once(__DIR__ . '/RepeaterMatrixPageArray.php');
+	}
+	
+	/**
+	 * Get the class to use for this Fieldtype's Inputfield
+	 * 
+	 * @return string
+	 * 
+	 */
+	protected function getInputfieldClass() {
+		return 'InputfieldRepeaterMatrix';
+	}
+
+	/**
+	 * Get the class used for repeater Page objects
+	 *
+	 * @return string
+	 *
+	 */
+	public function getPageClass() {
+		return __NAMESPACE__ . "\\RepeaterMatrixPage";
+	}
+
+	/**
+	 * Get the class used for repeater PageArray objects
+	 *
+	 * @return string
+	 *
+	 */
+	public function getPageArrayClass() {
+		return __NAMESPACE__ . "\\RepeaterMatrixPageArray";
+	}
+
+	/**
+	 * Return the repeater matrix template used by Field, i.e. repeater_name
+	 *
+	 * @param Field $field
+	 * @return Template
+	 * @throws WireException
+	 *
+	 */
+	protected function getRepeaterTemplate(Field $field) {
+		$template = parent::getRepeaterTemplate($field);
+		if(!$template->fieldgroup->hasField('repeater_matrix_type')) {
+			$f = $this->wire('fields')->get('repeater_matrix_type');
+			$template->fieldgroup->add($f);
+			$template->fieldgroup->save();
+			//$this->message("Added field 'repeater_matrix_type' to template '$template'", Notice::debug);
+		}
+		return $template;
+	}
+
+	/**
+	 * Return configuration fields definable for each FieldtypePage
+	 * 
+	 * @param Field $field
+	 * @return InputfieldWrapper
+	 *
+	 */
+	public function ___getConfigInputfields(Field $field) {
+		$inputfields = parent::___getConfigInputfields($field);
+		$f = $inputfields->getChildByName('repeaterTitle');
+		$f->parent->remove($f);
+		$template = $this->getRepeaterTemplate($field); 
+		require_once(__DIR__ . '/config.php');
+		$helper = new FieldtypeRepeaterMatrixConfigHelper($field, $template);
+		return $helper->getConfigInputfields($inputfields);
+	}
+
+	/**
+	 * Save field configuration
+	 * 
+	 * @param Field $field
+	 * @param Template $template
+	 * @param Page $parent
+	 * 
+	 */
+	protected function ___saveConfigInputfields(Field $field, Template $template, Page $parent) {
+		require_once(__DIR__ . '/config.php');
+		$helper = new FieldtypeRepeaterMatrixConfigHelper($field, $template);
+		$helper->saveConfigInputfields();
+		parent::___saveConfigInputfields($field, $template, $parent);
+	}
+
+	/**
+	 * Get the max quantity of matrix types (highest 'n' value used by matrix type in $field)
+	 * 
+	 * @param Field $field
+	 * @return int
+	 * 
+	 */
+	public function getMaxMatrixTypes(Field $field) {
+		static $maxMatrixTypes = array();
+		if(isset($maxMatrixTypes[$field->id])) return $maxMatrixTypes[$field->id];
+		$max = 0;
+		foreach(array_keys($field->getArray()) as $property) {
+			if(strpos($property, 'matrix') !== 0 || !strpos($property, '_name')) continue;
+			list($x, $n) = explode('matrix', "x$property", 2);	
+			if($x) {}
+			list($n, $x) = explode('_', $n);
+			if($x) {}
+			if(ctype_digit($n) && ((int) $n) > $max) $max = (int) $n;
+		}
+		if($max) {
+			$maxMatrixTypes[$field->id] = $max;
+		} else {
+			$max = 5;
+		}
+		return $max;
+	}
+
+	/**
+	 * Return an array of matrix types in format [ typeName => typeNumber ]
+	 * 
+	 * @param Field $field
+	 * @return array
+	 * 
+	 */
+	public function getMatrixTypes(Field $field) {
+		$matrixTypes = [];
+		for($n = 1; $n <= $this->getMaxMatrixTypes($field); $n++) {
+			$name = $field->get("matrix{$n}_name");
+			if($name) $matrixTypes[$name] = $n;
+		}
+		return $matrixTypes;
+	}
+
+	/**
+	 * Just here to fulfill ConfigurableModule interface
+	 * 
+	 * @param array $data
+	 * @return InputfieldWrapper
+	 *
+	 */
+	public function getModuleConfigInputfields(array $data) {
+		$inputfields = parent::getModuleConfigInputfields($data);
+		return $inputfields;
+	}
+
+	/**
+	 * Install the module
+	 *
+	 */
+	public function ___install() {
+		// install 'repeater_matrix_type' field that will be added to each RepeaterMatrix page
+		$field = $this->wire('fields')->get('repeater_matrix_type');
+		if(!$field) {
+			$field = $this->wire(new Field());
+			$field->type = $this->modules->get("FieldtypeInteger");
+			$field->name = 'repeater_matrix_type';
+			$field->label = 'Repeater matrix type';
+			$field->flags = Field::flagSystem | Field::flagPermanent | Field::flagAutojoin;
+			$field->save();
+			$this->message("Created Field: $field->name");
+		}
+	}
+
+	/**
+	 * Uninstall the module
+	 *
+	 */
+	public function ___uninstall() {
+		foreach($this->wire('fields') as $field) {
+			if($field->type->className() == $this->className()) {
+				throw new WireException("Cannot uninstall because this fieldtype is used by $field->name");
+			}
+		}
+		$field = $this->wire('fields')->get('repeater_matrix_type');
+		if($field) {
+			$field->flags = Field::flagSystemOverride;
+			$field->flags = 0;
+			$this->wire('fields')->delete($field);
+			$this->message("Removed field: $field");
+		}
+	}
+
+}
+

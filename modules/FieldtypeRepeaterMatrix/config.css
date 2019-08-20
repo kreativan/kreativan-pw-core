@@ -1,0 +1,28 @@
+
+#RepeaterMatrixItems .MatrixItem,
+#RepeaterMatrixItems .MatrixItem > .InputfieldHeader,
+#RepeaterMatrixItems .MatrixItem > .InputfieldContent {
+	background: rgba(255,255,255,0.4);
+}
+
+#RepeaterMatrixItems .MatrixItemDeletePending > .InputfieldHeader {
+	background: red;
+	color: white;
+	text-decoration: line-through;
+}
+#RepeaterMatrixItems .MatrixItemDeletePending > .InputfieldHeader i.fa {
+	color: white !important; 
+}
+
+#RepeaterMatrixItems .MatrixItemDeletePending > .InputfieldContent {
+	background: red;
+}
+
+#RepeaterMatrixItems .MatrixItem + .MatrixItem {
+	margin-top: 0.75em;
+}
+
+table.MatrixFiles td {
+	padding-right: 1em;
+	border-bottom: 1px solid #ddd;
+}

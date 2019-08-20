@@ -1,0 +1,249 @@
+table.InputfieldTable {
+	width: 100%;
+}
+
+table.InputfieldTable th {
+	vertical-align: bottom;
+	text-align: left; 
+}
+
+table.InputfieldTable tbody tr td {
+	text-align: left;
+}
+table.InputfieldTable > tbody > tr > td:first-child, 
+table.InputfieldTable > tbody > tr > td:last-child,
+table.InputfieldTable > thead > tr > th:last-child {
+	/* drag and delete icons */
+	max-width: 20px; 
+	border-left: none; 
+	border-right: none; 
+}
+table.InputfieldTable > thead > tr > th:nth-child(2),
+table.InputfieldTable > tbody > tr > td:nth-child(2) {
+	/*border-left: none; */
+}
+
+.Inputfield.InputfieldTable table.InputfieldTable td,
+.Inputfield.InputfieldTable table.InputfieldTable th {
+	padding: 0.35em; 
+}
+.Inputfield.InputfieldTable table.InputfieldTable tbody tr td:first-child {
+	padding-left: 0;
+}
+table.InputfieldTable tbody tr td:last-child {
+	padding-right: 0; 
+}
+table.InputfieldTable tbody tr td.InputfieldTableActionDelete {
+	text-align: right;
+}
+
+.Inputfields table.InputfieldTable td input[type=text],
+.Inputfields table.InputfieldTable td input[type=email],
+.Inputfields table.InputfieldTable td input[type=date],
+.Inputfields table.InputfieldTable td input[type=datetime],
+.Inputfields table.InputfieldTable td input[type=url], 
+.Inputfields table.InputfieldTable td textarea,
+.Inputfields table.InputfieldTable td select {
+	min-width: 0;
+	width: 100%; 
+}
+
+table.InputfieldTable td label.checkbox {
+	display: block;
+	clear: both;
+}
+
+table.InputfieldTable td label.checkbox > span.checkbox {
+	display: inline-block;
+	float: left;
+	width: 8%;
+	max-width: 20px;
+}
+table.InputfieldTable td label.checkbox span.pw-no-select {
+	float: left;
+	display: inline-block;
+	width: auto;
+	width: 92%;
+	padding-left: 0.25em; 
+}
+
+table.InputfieldTable tr.InputfieldTableRowTemplate {
+	display: none; 
+}
+
+table.InputfieldTable td .InputfieldTableRowSortHandle {
+	cursor: move; 
+}
+
+table.InputfieldTable tr.InputfieldTableRowDeleted input, 
+table.InputfieldTable tr.InputfieldTableRowDeleted select, 
+table.InputfieldTable tr.InputfieldTableRowDeleted label {
+	text-decoration: line-through; 
+}
+table.InputfieldTable .InputfieldTableRowDeleteLink {
+	cursor: pointer; 
+}
+
+/**
+ * Nested table
+ *
+ */
+table.InputfieldTableNested {
+	width: 100%;
+}
+
+table.InputfieldTableHasNested td table.InputfieldTableNested {
+	width: 100%;
+	margin: 0.5em 0 0 0;
+	border: none;
+}
+table.InputfieldTableHasNested td table.InputfieldTableNested td,
+table.InputfieldTableHasNested td table.InputfieldTableNested th {
+	text-align: left;
+	border: none;
+	padding-right: 0.35em;
+}
+table.InputfieldTableHasNested td table.InputfieldTableNested th {
+	padding-top: 1em;
+}
+table.InputfieldTableHasNested td table.InputfieldTableNested + table.InputfieldTableNested th {
+	padding-top: 0.25em;
+}
+
+.Inputfields table.InputfieldTableHasNested tr:hover th,
+.Inputfields table.InputfieldTableHasNested tr:hover td {
+	/* disable the default background hover color */
+	background-color: inherit;
+}
+
+table.InputfieldTableHasNested > tbody > tr.ui-sortable-helper {
+	background-color: #fff;
+}
+table.InputfieldTableHasNested > tbody > tr.ui-sortable-helper,
+table.InputfieldTableHasNested > tbody > tr.ui-sortable-helper > td:nth-child(2),
+table.InputfieldTableHasNested > tbody > tr.ui-sortable-helper td table.InputfieldTableNested {
+	width: 100%; 
+}
+
+table.InputfieldTableHasNested {
+	border-spacing: 0;
+	border-collapse: collapse;
+}
+.Inputfields table.InputfieldTableHasNested:not(.InputfieldTableSearch) > tbody > tr > td {
+	padding-bottom: 1em;
+	padding-top: 0;
+	border-bottom: 2px solid;
+	border-color: initial;
+}
+table.InputfieldTableHasNested > tbody > tr.ui-sortable-helper > td,
+table.InputfieldTableHasNested > tbody > tr:nth-child(2) > td {
+	/* ensure the first row has a border, since other borders are applied to bottom */
+	border-top: 2px solid;
+	border-color: initial;
+}
+
+table.InputfieldTableHasNested td table.InputfieldTableNested td {
+	padding-top: 0;
+	padding-bottom: 0.5em;
+}
+
+.Inputfields table.InputfieldTableHasNested > tbody > tr > td.InputfieldTableActionSort,
+.Inputfields table.InputfieldTableHasNested > tbody > tr > td.InputfieldTableActionDelete {
+	/* sort and trash icon actions */
+	padding-top: 0.8em;
+	text-align: center;
+}
+table.InputfieldTableHasNested > tbody > tr > td:first-child .rowNum {
+	position: relative;
+	top: 2px;
+}
+
+table.InputfieldTableEmpty {
+	display: none;
+}
+
+.Inputfields table.InputfieldTable .asmListItem a.asmListItemRemove:hover,
+.Inputfields table.InputfieldTable .asmListItem a.asmListItemRemove {
+	/* AsmSelect trash icon inherits AdminDataTable <a> color, so this reverts that */
+	color: inherit;
+}
+
+/**
+ * Language Tabs
+ *
+ */
+
+.InputfieldTable .InputfieldTable_langTabs.ui-tabs,
+#content .InputfieldTable .InputfieldTable_langTabs.ui-tabs {
+	margin: 0;
+	padding: 0;
+}
+.AdminThemeReno .InputfieldTable .InputfieldTable_langTabs .ui-tabs-nav,
+.AdminThemeReno .InputfieldTable .InputfieldTable_langTabs .ui-tabs-nav li,
+.AdminThemeReno #content .InputfieldTable .InputfieldTable_langTabs .ui-tabs-nav,
+.AdminThemeReno #content .InputfieldTable .InputfieldTable_langTabs .ui-tabs-nav li {
+	padding-top: 0;
+	margin-top: 0;
+}
+
+.InputfieldTable .InputfieldTable_langTab.ui-tabs .ui-tabs-panel {
+	padding: 0.35em 0 0 0;
+}
+
+.InputfieldTable_langTabs > ul.ui-tabs {
+	display: none;
+}
+
+.InputfieldTable_hasLangTabs .InputfieldTable_langTabs.ui-tabs > ul {
+	display: block;
+}
+
+.InputfieldTable .InputfieldTablePagerNav {
+	margin-top: 0;
+}
+
+.InputfieldTableHasPagination .InputfieldTablePagerNote {
+	padding-top: 0.5em;
+	float: right;
+}
+
+.InputfieldTableDeleteAll {
+	display: none;
+	border: 2px solid red;
+	padding: 0.5em 1em;
+	color: crimson;
+}
+
+.InputfieldTablePagerNavContent > p:last-child {
+	margin-bottom: 0;
+}
+
+.InputfieldTableSearch:not(.InputfieldTableSearchActive) {
+	display: none;
+}
+
+.InputfieldTable > .InputfieldContent .InputfieldTableSearchToggle {
+	/* find/filters get moved to header by js */
+	display: none;
+}
+
+.InputfieldTable > .InputfieldHeader .InputfieldTableSearchToggle {
+	/* find/filters link in header */
+	float: right;
+	margin-right: 0.5em;
+	font-weight: normal;
+}
+
+.InputfieldTable > .InputfieldHeader .InputfieldTableSearchToggle:hover {
+	text-decoration: none;
+}
+
+.InputfieldTableNested .InputfieldCKEditorInline {
+	width: 100%;
+}
+
+.InputfieldTable input[type=number] {
+	width: 100%;
+}
+
+

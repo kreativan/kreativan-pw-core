@@ -1,0 +1,84 @@
+Table 0.1.9 - Requires ProcessWire 3.0.62+
+-----------
+- Add support for use with AdminThemeUikit
+- Bugfixes, tweaks and optimizations
+
+Table 0.1.8 - Requires ProcessWire 3.0.42+
+-----------
+- Add support for export/import per ProcessWire 3.0.71+
+- Convert to using PW3 namespace
+- Bugfixes, tweaks and optimizations
+
+Table 0.1.6 & 0.1.7 - Requires ProcessWire 2.8.27+ or 3.0.27+
+-------------------
+- Bugfixes, tweaks and optimizations
+
+Table 0.1.5 - Requires ProcessWire 2.8.27+ or 3.0.27+
+-----------
+- Various bug fixes for features added in 0.1.4
+
+Table 0.1.4 beta - Requires ProcessWire 2.8.27+ or 3.0.27+
+-----------
+- Add pagination support, enabling any quantity of rows in tables. 
+- Add automatic sorting support (required when using pagination).
+- Add "Find" support (filtering) in field editor (requires pagination).
+- Add double-click to delete all option (see setting in field config).
+- Make the "Add Row" link text customizable (multi-language supported).
+- Documentation updates to cover all new features (bottom of README file).
+- Complete refactoring of InputfieldTable.js.
+
+Table 0.1.3 & 0.1.2 - ProcessWire 2.7.2 or newer
+-----------
+- Various minor bug fixes and updates for better compatibility with PW3. 
+
+Table 0.1.1 - Requires ProcessWire 2.6.12 or newer
+-----------
+- Fix issue with autocomplete input use of labelField
+
+Table 0.1.0 - Requires ProcessWire 2.6.12 or newer
+-----------
+- Minor bug fixes
+
+Table 0.0.8/0.0.9 - Requires ProcessWire 2.6.12 or newer
+-----------
+- Add support for autocomplete (single and multiple) Page reference fields.
+- Add support for AJAX editing of table fields (2.6.12+)
+- Improved support for granular selection of Table properties for filtering
+  in Lister/ListerPro. 
+
+Table 0.0.7 - Requires ProcessWire 2.6.0 or newer
+-----------
+- Add support for single and multi Page-reference fields:
+	* Single Page types: radios, select
+	* Multi Page types: checkboxes, select multiple, asmSelect (sortable)
+	* Choose which pages are selectable with InputfieldSelector configuration.
+- Add support for unlimited columns:
+	* When combined width of your columns exceeds 100%, it creates a new
+	  row within your row, enabling you to support any number of columns
+	  in a single row. When active, it displays the column headings with 
+	  each input, rather than as a table header. 
+- Add support for rich text (CKEditor) fields:
+	* Specify a regular PW CKEditor field to pull settings from. 
+	* Use of CKEditor fields requires ProcessWire 2.6.4 or newer. 
+- Add support for multi-language text fields:
+	* Types include multi-language: text, textarea, CKEditor
+	* Requires that you have installed: LanguageSupport, LanguageTabs
+- Add support for multi-language table column labels. 
+- Add help text for most column settings properties. 
+- Add support for select-multiple options type (as alternative to checkboxes).
+- Expand support for selection of Table properties in Lister/ListerPro. 
+- Fix bug that got a column definitions settings mixed up with others 
+  when sorting in the field settings page. 
+  
+Table 0.0.6
+-----------
+- Various bug fixes. 
+- Support for additional integer types. 
+
+Table 0.0.5
+-----------
+- Fix issue when cloning a Table field. 
+
+Table 0.0.4
+-----------
+- First public release (beta).

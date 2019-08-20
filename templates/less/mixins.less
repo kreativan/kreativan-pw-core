@@ -7,9 +7,9 @@
  *  because gradients doesnt support css transitions...
  *  Great for buttons...
 */
-.gradient-hover-mixin(@bg-dark, @bg-light, @direction: left) {
+.gradient-hover-mixin(@bg-dark, @bg-light, @direction: -90deg) {
 
-    background: -webkit-linear-gradient(@direction, @bg-light 0%,@bg-dark 50%,@bg-light 100%);
+    background: linear-gradient(@direction, @bg-light 0%,@bg-dark 50%,@bg-light 100%);
     background-size: 300%,1px;
     background-position: 0%;
     transition: all .5s;

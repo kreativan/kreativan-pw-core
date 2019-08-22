@@ -28,7 +28,7 @@ function getLinkOptions($menu) {
     if ($link_type == "2" && !empty($page_link)) {
         $p = wire("pages")->get("id=$page_link");
         $href = $p->url;
-        $class .= ($p->id == wire("page")->id) ? "uk-active" : "";
+        $class .= ($p->id == wire("page")->id || $p->id == wire("page")->rootParent->id) ? "uk-active" : "";
     } else {
         $href = $link;
         $attr .= ($link_attr[1]) ? " target='_blank'" : "";

@@ -6,6 +6,7 @@
  *  renderBreadcrumb()
  *	renderAlert()
  *	renderButton()
+ *	renderLinkBlock()
  *
 */
 
@@ -114,4 +115,54 @@ function renderButton($b, $class = "") {
 	}
     
    	return $button;
+}
+
+
+/**
+ *  Render LInk Block
+ * 
+ */
+function renderLinkBlock($link_block, $title = "", $class = "") {
+
+    $link_type  = $link_block->link_type;
+    $page_link  = $link_block->select_page;
+    $link       = $link_block->link;
+    $link_attr  = $link_block->link_attr;
+
+    $href   = "#";
+    $attr   = "";
+    $span   = "";
+
+    if ($link_type == "3" && !empty($page_link)) {
+        $p = wire("pages")->get("id=$page_link");
+        $href = $p->url;
+    } else {
+        $href = $link;
+        $attr .= ($link_attr[1]) ? " target='_blank'" : "";
+        $attr .= ($link_attr[2]) ? " rel='nofollow'" : "";
+        $attr .= ($link_attr[3]) ? " uk-toggle" : "";
+        // scroll
+        $attr .= ($link_attr[4]) ? " uk-scroll" : "";
+    }
+
+    $attr .= !empty($title) ? " title='$menu->title'" : "";
+ 
+    /**
+     *   if link_type is page, check selected page_link for access permission,
+     *   if not, check "home page" for access permission, (access is granted).
+     *
+     *   To check if page is viewable use: <?php if($pageAccess->viewable()) : ?>
+     *   Note: PAGE_LINK TEMPLATE MUST HAVE TEMPLATE FILE, if not item won't be visible
+     *
+     */
+    $pageAccess = "";
+    $pageAccess = wire("pages")->get("/");
+    if($link_type == '3' && !empty($page_link)) {
+        $pageAccess = wire("pages")->get("id=$page_link");
+    }
+
+    if($link_type != "1" && $pageAccess->viewable()) {
+        return "<a class='$class' href='$href' $attr>$title</a>";
+    }
+
 }

@@ -62,10 +62,7 @@
                         <i class="fa fa-refresh uk-text-primary"></i>
                     </a>
 
-                    <a href="#" class="ivm-ajax-button uk-text-danger" title="Delete" uk-tooltip
-                        data-id="<?= $item->id ?>"
-                        data-action="delete"
-                    >
+                    <a href="<?= $page->url ?>?admin_action=delete&id=<?= $item->id ?>" title="Delete" uk-tooltip>
                         <i class="fa fa-trash"></i>
                     </a>
 

@@ -72,6 +72,15 @@ if($action) {
         $this->session->redirect("./");
 
     }
+	
+	// Delete
+
+    if($action == "delete") {
+
+        $this->pages->delete($p);
+        $this->session->redirect("./");
+
+    }
 
 
 }

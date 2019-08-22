@@ -136,6 +136,7 @@ function renderLinkBlock($link_block, $title = "", $class = "") {
     if ($link_type == "3" && !empty($page_link)) {
         $p = wire("pages")->get("id=$page_link");
         $href = $p->url;
+        $attr .= " title='$p->title'";
     } else {
         $href = $link;
         $attr .= ($link_attr[1]) ? " target='_blank'" : "";
@@ -144,8 +145,6 @@ function renderLinkBlock($link_block, $title = "", $class = "") {
         // scroll
         $attr .= ($link_attr[4]) ? " uk-scroll" : "";
     }
-
-    $attr .= !empty($title) ? " title='$menu->title'" : "";
  
     /**
      *   if link_type is page, check selected page_link for access permission,

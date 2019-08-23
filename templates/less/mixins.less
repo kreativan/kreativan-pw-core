@@ -20,3 +20,15 @@
     }
 
 }
+
+/**
+ *  Gradient icon color mixin
+ *  Works great with font-awesome icons
+ */
+.gradient-icon-mixin(@color, @color-2, @deg: 0deg) {
+    color: @color;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-image: -webkit-linear-gradient(@deg, @color-2 0%, @color 100%);
+    background-image: -moz-linear-gradient(@deg, @color-2 0%, @color 100%);
+}

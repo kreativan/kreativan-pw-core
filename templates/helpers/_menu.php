@@ -25,7 +25,7 @@ function getLinkOptions($menu) {
     $class .= ($menu->menu && $menu->menu->count) ? " uk-parent" : "";
 
     // link_type + href + attr
-    if ($link_type == "2" && !empty($page_link)) {
+    if ($link_type == "3" && !empty($page_link)) {
         $p = wire("pages")->get("id=$page_link");
         $href = $p->url;
         $class .= ($p->id == wire("page")->id || $p->id == wire("page")->rootParent->id) ? "uk-active" : "";
@@ -53,7 +53,7 @@ function getLinkOptions($menu) {
      */
     $pageAccess = "";
     $pageAccess = wire("pages")->get("/");
-    if($link_type == '2' && !empty($page_link)) {
+    if($link_type == '3' && !empty($page_link)) {
         $pageAccess = wire("pages")->get("id=$page_link");
     }
 
@@ -147,20 +147,29 @@ function renderNavItem($menu) {
     return $html;
 }
 
-/**
- *  Render Subnav
- *  @var Page $menu     menu child pages or repeater, with a link_block field
- *  @var string $align  left/right/center
- *  @var string $class  uikit subnav class
- *
- */
-function renderSubnav($menu, $align = "center", $class = "uk-subnav-divider") {
 
-    $html = "<ul class='uk-subnav $class uk-flex-$align'>";
-    foreach($menu as $item) {
-        $html .= renderMenuItem($item);
+/**
+ *  Render Main Navbar Menu
+ *  @param PageArray $navbar eg: $page->children("include=hidden, sort=sort");
+ *  @param bool $home
+ */
+function renderNavbarMenu($navbar, $home = true) {
+
+    // Start
+    $html = "<ul class='uk-navbar-nav'>";
+
+    // Home link
+    if($home == true) {
+        $class = (wire("page")->id == "1") ? 'uk-active' : '';
+        $href = wire("pages")->get("/")->url;
+        $title = wire("pages")->get("/")->title;
+        $html .= "<li class='$class'>";
+        $html .= "<a href='$href'>$title</a>";
+        $html .= "</li>";
     }
-    $html .= "</ul>";
+
+    // Navbar Items
+    foreach ($navbar as $menu) $html .= renderNavbarItem($menu);
 
     return $html;
 
@@ -202,27 +211,40 @@ function renderMobileMenu($mobile_menu, $align = "center", $v_align = true, $hom
 
 
 /**
- *  Render Main Navbar Menu
- *  @param PageArray $navbar eg: $page->children("include=hidden, sort=sort");
- *  @param bool $home
+ *  Render Subnav Menu
+ *  @var Page $menu     menu child pages or repeater, with a link_block field
+ *  @var string $align  left/right/center
+ *  @var string $class  uikit subnav class
+ *
  */
-function renderNavbarMenu($navbar, $home = true) {
+function renderSubnavMenu($menu, $align = "center", $class = "uk-subnav-divider") {
 
-    // Start
-    $html = "<ul class='uk-navbar-nav'>";
-
-    // Home link
-    if($home == true) {
-        $class = (wire("page")->id == "1") ? 'uk-active' : '';
-        $href = wire("pages")->get("/")->url;
-        $title = wire("pages")->get("/")->title;
-        $html .= "<li class='$class'>";
-        $html .= "<a href='$href'>$title</a>";
-        $html .= "</li>";
+    $html = "<ul class='uk-subnav $class uk-flex-$align'>";
+    foreach($menu as $item) {
+        $html .= renderMenuItem($item);
     }
+    $html .= "</ul>";
 
-    // Navbar Items
-    foreach ($navbar as $menu) $html .= renderNavbarItem($menu);
+    return $html;
+
+}
+
+/**
+ *  Render Nav Menu
+ *  @var Page $menu     menu child pages or repeater, with a link_block field
+ *  @var string $class  uikit subnav class
+ *  @var bool $nav
+ *
+ */
+function renderNavMenu($menu, $class = "", $nav = true) {
+
+    $nav_class = "uk-nav-default uk-nav-parent-icon";
+    $nav_class .= !empty($class) ? " $class" : "";
+    $nav_attr = $nav == true ? "uk-nav" : "";
+
+    $html = "<ul class='$nav_class' $nav_attr>";
+        foreach ($menu as $item) $html .= renderNavItem($item);
+    $html .= "</ul>";
 
     return $html;
 

@@ -5,30 +5,33 @@
  *  @author Ivan Milincic <lokomotivan@gmail.com>
  *  @copyright 2017 Ivan Milincic
  *
- *  @var custom_admin_email  -- override admin email
- *  @var custom_form_message  --  Override form success message
+ *  @var admin_email  -- override admin email
+ *  @var form_message  --  Override form success message
  *
 */
+
+// Lang Strings
+$_lng = $pages->get("template=system")->lng;
 
 // load captcha.js
 loadJS($config->urls->templates . "lib/captcha.js");
 
 // admin email
-$admin_email = !empty($custom_admin_email) ? $custom_admin_email : $system->site_info->email;
+$admin_email = !empty($admin_email) ? $admin_email : setting("site_email");
 // form submit message
-$form_message = !empty($custom_form_message) ? $custom_form_message : $lng___form_message;
+$form_message = !empty($form_message) ? $form_message : $_lng->form_message;
 
 // Process Form
 if($input->post->submit && $session->CSRF->hasValidToken()) {
 
     // fields
-    $name          = $sanitizer->text($input->post->name);
-    $email         = $sanitizer->email($input->post->email);
-    $subject       = $sanitizer->text($input->post->subject);
-    $message       = $sanitizer->textarea($input->post->message);
+    $name = $sanitizer->text($input->post->name);
+    $email = $sanitizer->email($input->post->user_email);
+    $message = $sanitizer->textarea($input->post->message);
+    $message = nl2br($message);
 	
 	// honeypot
-	$honeypot	= $input->post->honeypot;
+	$honeypot = $input->post->email;
 	
     // captcha
     $q          = $sanitizer->text($input->post->numb_captcha);
@@ -38,7 +41,7 @@ if($input->post->submit && $session->CSRF->hasValidToken()) {
 		
 		// email vars
 		$email_to       = $admin_email;
-		$email_subject  = !empty($subject) ? $subject : $name;
+		$email_subject  = "Message from $name - " . setting("site_name");
 		$email_from     = $email;
 		$email_body     = "<p>$message</p>";
 		
@@ -71,23 +74,18 @@ if($session->get("alert")) {
 <form id="contact-form" action="./" method="POST">
 
     <?php echo $session->CSRF->renderInput(); ?>
-	<input class="uk-hidden" type="email" name="honeypot" />
+	<input class="uk-hidden" type="email" name="email" />
 
-    <div class="uk-child-width-expand@m uk-margin" uk-grid>
-        <div>
-            <input class="uk-input" type="text" name="name" placeholder="<?= $lng___name ?>" required />
-        </div>
-        <div>
-            <input class="uk-input" type="email" name="email" placeholder="<?= $lng___email ?>" required />
-        </div>
+    <div>
+        <input class="uk-input" type="text" name="name" placeholder="<?= $_lng->name ?>" required />
     </div>
 
     <div class="uk-margin">
-        <input class="uk-input" type="text" name="subject" placeholder="<?= $lng___subject ?>" />
+        <input class="uk-input" type="email" name="user_email" placeholder="<?= $_lng->email ?>" required />
     </div>
 
     <div class="uk-margin">
-        <textarea class="uk-textarea" name="message" placeholder="<?= $lng___message ?>" rows="5" required></textarea>
+        <textarea class="uk-textarea" name="message" placeholder="<?= $_lng->message ?>" rows="5" required></textarea>
     </div>
 
     <!-- captcha -->
@@ -114,7 +112,7 @@ if($session->get("alert")) {
         <div class="uk-width-expand@s">
             <input class="uk-hidden" name="contact_form" value="1" />
             <button id="button-submit" class="uk-button uk-button-primary" name="submit" value="submit" form="contact-form" disabled>
-                <?= $lng___contact_us ?>
+                <?= $_lng->contact_us ?>
             </button>
         </div>
 

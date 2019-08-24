@@ -7,10 +7,10 @@
 
 			<p>
 				<?php
-					$site_name = $site_settings->site_info->site_name;
-					$website = "<a href='{$site_settings->site_info->website}'>$site_name</a>";
-					$copyright = str_replace("{{date}}", date("Y"), $site_settings->text);
-					$copyright = str_replace("{{site_name}}", $site_name, $copyright);
+					$copyright = $_lng->copyright;
+					$copyright = str_replace("{{date}}", date("Y"), $copyright);
+					$copyright = str_replace("{{site_name}}", setting("site_name"), $copyright);
+					$website = "<a href='".setting("site_webite")."'>".setting("site_name")."</a>";
 					$copyright = str_replace("{{website}}", $website, $copyright);
 					echo $copyright;
 				?>

@@ -135,8 +135,7 @@ function renderNavbarItem($menu) {
 function renderNavItem($menu) {
     $options = getLinkOptions($menu);
     $subnav = $menu->menu;
-    $class = $subnav && $subnav->count ? "uk-parent {$options["class"]}" : $options["class"];
-    $html = "<li class='$class'>";
+    $html = "<li class='{$options["class"]}'>";
     $html .= "<a href='{$options['href']}' {$options['attr']}>{$menu->title}</a>";
     if($subnav && $subnav->count) {
         $html .= "<ul class='uk-nav-sub'>";

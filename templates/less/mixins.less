@@ -7,9 +7,9 @@
  *  because gradients doesnt support css transitions...
  *  Great for buttons...
 */
-.gradient-hover-mixin(@bg-dark, @bg-light, @direction: -90deg) {
+.gradient-hover-mixin(@bg-1, @bg-2, @direction: -90deg) {
 
-    background: linear-gradient(@direction, @bg-light 0%,@bg-dark 50%,@bg-light 100%);
+    background: linear-gradient(@direction, @bg-2 0%,@bg-1 50%,@bg-2 100%);
     background-size: 300%,1px;
     background-position: 0%;
     transition: all .5s;
@@ -22,13 +22,18 @@
 }
 
 /**
- *  Gradient icon color mixin
- *  Works great with font-awesome icons
+ *  Gradient color mixin
+ *  Works great with etxt & icons fonts
  */
-.gradient-icon-mixin(@color, @color-2, @deg: 0deg) {
-    color: @color;
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
+.gradient-color-mixin(@color, @color-2, @deg: 90deg) {
+    color: transparent;
     background-image: -webkit-linear-gradient(@deg, @color-2 0%, @color 100%);
     background-image: -moz-linear-gradient(@deg, @color-2 0%, @color 100%);
+    background-image: linear-gradient(@deg, @color-2 0%, @color 100%);
+    -webkit-background-clip: text;
+    -moz-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    -moz-text-fill-color: transparent;
+    text-fill-color: transparent;
 }

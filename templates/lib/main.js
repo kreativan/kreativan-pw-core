@@ -6,7 +6,8 @@ function setActiveParent() {
         active.forEach(e => {
             var parent = e.closest("li.uk-parent");
             parent.classList.add("uk-active");
-            console.log(parent);
+			parent.classList.add("uk-open");
+            // console.log(parent);
         });
     }
 }

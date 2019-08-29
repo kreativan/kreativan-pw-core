@@ -14,6 +14,12 @@
  *
 */
 
+// lng
+function lng($string) {
+    include(wire('config')->paths->templates . "_lang.php");
+    return $lng["$string"];
+}
+
 // load js
 function loadJS($js) {
     wire('config')->scripts->add($js);

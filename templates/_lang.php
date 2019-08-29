@@ -1,16 +1,20 @@
 <?php namespace ProcessWire;
 
-$lng___copyright		= __text("Copyright © {{date}} {{site_name}}", "copyright", "label=Footer Copyright Text, notes=Use: `{{date}} {{site_name}} {{website}}`");
-
-$lng___read_more		= __('Read More');
-
-// contact
-$lng___name             = __('Name');
-$lng___email            = __('Email');
-$lng___subject          = __('Subject');
-$lng___message          = __('Message');
-$lng___send             = __('Send');
-$lng___send_message     = __('Send Message');
-$lng___contact          = __('Contact');
-$lng___contact_us       = __('Contact Us');
-$lng___form_message     = __('Your message has been sent. Thank you for your time.');
+$lng = [
+	
+	// General
+	"copyright" => __("Copyright © {{date}} {{site_name}}", "copyright", "label=Footer Copyright Text, notes=Use: `{{date}} {{site_name}} {{website}}`"),
+	"read_more" => __('Read More'),
+	
+	// Contact
+	"name"			=> __('Name'),
+	"email"			=> __('Email'),
+	"subject"		=> __('Subject'),
+	"message"		=> __('Message'),
+	"send"			=> __('Send'),
+	"send_message"	=> __('Send Message'),
+	"contact"		=> __('Conact'),
+	"contact_us"	=> __('Contact Us'),
+	"form_message"	=> __('Your message has been sent. Thank you for your time.'),
+	
+];

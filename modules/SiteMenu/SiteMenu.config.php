@@ -43,9 +43,20 @@ class SiteMenuConfig extends ModuleConfig {
 			$f->columnWidth = "100%";
             $options->add($f);
 
+			// mobile_menu_style
+			$f = $this->wire('modules')->get("InputfieldRadios");
+			$f->attr('name', 'mobile_menu_style');
+			$f->label = 'Mobile Menu Style';
+			$f->options = array('1' => $this->_('Drop'),'2' => $this->_('Offcanvas'),);
+			$f->required = true;
+			$f->defaultValue = 1;
+			$f->optionColumns = 1;
+			$f->columnWidth = "100%";
+            $options->add($f);
+
 		// render fieldset
         $inputfields->add($options);
-        
+
 
 
 		// render fields

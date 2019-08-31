@@ -23,7 +23,7 @@
 
 	<!-- main js -->
 	<script defer type='text/javascript' src='<?=  $config->urls->templates . 'lib/main.js' ; ?>'></script>
-	
+
 	<!-- Google Maps -->
     <script defer src="https://maps.googleapis.com/maps/api/js?key=<?= $modules->get("FieldtypeMapMarker")->googleApiKey ?>&callback=initMap"></script>
 
@@ -36,18 +36,9 @@
 
 <body class="<?= $page->template ?>-tmpl">
 
-<div id="mobile-header" class="uk-hidden@m">
-	<a class="mobile-menu-button" href="#mobile-menu" uk-toggle>
-		<span uk-icon="icon: menu"></span>
-	</a>
-	<a class="logo" href="<?= $pages->get("/")->url ?>">
-		<?php if(!empty($site_settings->logo)) :?>
-			<img src="<?= $site_settings->logo->url ?>" alt="logo" />
-		<?php else: ?>
-			<div class="uk-margin-remove uk-inline"><?= setting("site_name"); ?></div>
-		<?php endif;?>
-	</a>
-</div>
+<?php
+	$files->include($config->paths->templates."markup/mobile-header.php");
+?>
 
 <div id="wrapper" class="uk-offcanvas-content">
 
@@ -69,7 +60,7 @@
 					</div>
 
 					<div class="uk-navbar-center">
-						<?php  
+						<?php
 							$main_menu = $pages->get("/system/main-menu/")->children("include=hidden, sort=sort");
 							echo renderNavbarMenu($main_menu, setting("show_home"));
 						?>

@@ -7,7 +7,7 @@
 
 			<p>
 				<?php
-					$copyright = $_lng->copyright;
+					$copyright = $site_settings->text;
 					$copyright = str_replace("{{date}}", date("Y"), $copyright);
 					$copyright = str_replace("{{site_name}}", setting("site_name"), $copyright);
 					$website = "<a href='".setting("site_webite")."'>".setting("site_name")."</a>";
@@ -20,19 +20,6 @@
 	</footer>
 
 </div> <!-- wrapper end -->
-
-<div id="mobile-menu" uk-offcanvas="overlay: true">
-  	<div class="uk-offcanvas-bar">
-	  	<button class="uk-offcanvas-close" type="button" uk-close></button>
-	  	<div class="uk-margin-large-top">
-		  	<!--
-
-			  	add your mobile menu here
-
-		  	-->
-	  	</div>
-	</div>
-</div>
 
 <?php
     // Dynamic js/css files

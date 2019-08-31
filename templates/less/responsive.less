@@ -1,5 +1,5 @@
 @tm-mobile-header-height:       70px;
-@tm-mobile-button-width:        80px;
+@tm-mobile-header-background:   #252525;
 //======================================================================
 //  Responsive
 //======================================================================
@@ -8,31 +8,62 @@
     position:relative;
     height: @tm-mobile-header-height;
     line-height: @tm-mobile-header-height;
-    background: @global-muted-background;
-
-    .mobile-menu-button {
-        position:absolute;
-        display:block;
-        width:@tm-mobile-button-width;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        background: @global-primary-background;
-        color: @global-inverse-color;
-        text-align: center;
-    }
-    .logo {
-        display:block;
-        box-sizing:border-box;
-        padding-left:@tm-mobile-button-width + 20px;
-        height:100%;
-        width:100%;
-    }
+    background: @tm-mobile-header-background;
 
     img {
         max-height: 35px;
     }
-    
+
+    span.uk-icon.tm-close {
+        display: none;
+    }
+
+    &.uk-open {
+        span.uk-icon.tm-open {
+            display: none;
+        }
+        span.uk-icon.tm-close {
+            display: block;
+        }
+    }
+
+    .uk-light();
+
+}
+
+#mobile-menu-drop {
+
+    display:none;
+    background: @tm-mobile-header-background;
+    border-top: 1px solid lighten(@tm-mobile-header-background, 5%);
+
+    .uk-light();
+
+    &.uk-open {
+        display:block;
+    }
+
+    .uk-nav > li > a {
+        padding:10px 15px;
+        text-transform: uppercase;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .uk-nav > li.uk-active > a {
+        background:fade(white, 5%);
+    }
+
+    & > div {
+        margin-top: 5px;
+        padding:10px 15px;
+        border-top: 1px solid lighten(@tm-mobile-header-background, 5%);
+    }
+
+    .uk-nav-sub > li.uk-active > a {
+        color: @global-primary-background;
+    }
+
 }
 
 /* Medium - Tablets

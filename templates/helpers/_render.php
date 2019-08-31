@@ -10,6 +10,28 @@
  *
 */
 
+/**
+ *  Render Widget
+ *  by id or name
+ *  @param int|string $id
+ */
+function renderWidget($id) {
+    $widget = wire("pages")->get("id|name=$id");
+    $file = wire("config")->paths->templates."widgets/{$widget->template}.php";
+    wire("files")->include("$file", [
+        "widget" => $widget
+    ]);
+}
+
+/**
+ *  Render JSON-LD
+ *  @param string $type
+ *  @param array $params
+ */
+function renderJSONLD($type, $params = []) {
+    $file = wire("config")->paths->templates ."JSON-LD/$type.php";
+    wire("files")->include($file, $params);
+}
 
 /**
  *  Pagination
@@ -96,16 +118,18 @@ function renderButton($b, $class = "") {
 
    	// attributes
    	$attr = "";
-   	$attr .= ($b->link_attr[1]) ? " target='_blank'" : "";
-   	$attr .= ($b->link_attr[2]) ? " rel='nofollow'" : "";
    	$attr .= " title='$b->title'";
 
    	// href
    	$href = "#";
-   	if($b->link_type == '2') {
-	   $href = $b->select_page->url;
+   	if($b->link_type == '3' && !empty($b->select_page)) {
+	    $href = $b->select_page->url;
    	} elseif($b->link_type == '1') {
-	   $href = $b->link;
+	    $href = $b->link;
+        $attr .= ($b->link_attr[1]) ? " target='_blank'" : "";
+        $attr .= ($b->link_attr[2]) ? " rel='nofollow'" : "";
+        $attr .= ($b->link_attr[3]) ? " uk-toggle" : "";
+        $attr .= ($b->link_attr[4]) ? " uk-scroll" : "";
    	}
 
    	// style
@@ -113,14 +137,16 @@ function renderButton($b, $class = "") {
 	if(!empty($b->title)) {
 		$button = "<a class='uk-button $style $class' href='$href' $attr>$b->title</a>";
 	}
-    
+
    	return $button;
 }
 
 
 /**
  *  Render LInk Block
- * 
+ *  @param Field $link_block
+ *  @param string $title link title
+ *  @param string $class
  */
 function renderLinkBlock($link_block, $title = "", $class = "") {
 
@@ -145,7 +171,7 @@ function renderLinkBlock($link_block, $title = "", $class = "") {
         // scroll
         $attr .= ($link_attr[4]) ? " uk-scroll" : "";
     }
- 
+
     /**
      *   if link_type is page, check selected page_link for access permission,
      *   if not, check "home page" for access permission, (access is granted).

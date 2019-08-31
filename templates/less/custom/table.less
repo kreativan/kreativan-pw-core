@@ -1,0 +1,42 @@
+/* ===========================================================
+    Table
+=========================================================== */
+
+@media(max-width: @breakpoint-medium) {
+
+    .uk-table-responsive td.uk-text-right {
+        text-align:left !important;
+    }
+
+}
+
+table:not(.uk-table) {
+
+    width:100% !important;
+    border:none !important;
+
+    td {
+        border:none !important;
+        padding:@table-small-cell-padding-vertical @table-cell-padding-horizontal;
+    }
+
+    tr:nth-child(odd) {
+        background: @table-striped-row-background;
+    }
+
+    caption {
+        font-size: @text-small-font-size;
+        text-align: left;
+        color: @global-muted-color;
+    }
+
+}
+
+.uk-table {
+
+    thead tr {
+        background: none;
+        border-top: 1px solid @global-border;
+    }
+
+}

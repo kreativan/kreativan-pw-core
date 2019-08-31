@@ -1,0 +1,198 @@
+/*
+ * "Uikit" theme
+ *
+ * Adapted from ProcessWire Uikit Admin Theme by Ryan Cramer (https://processwire.com)
+ *
+ * @author Teppo Koivula (https://github.com/teppokoivula)
+ */
+
+html {
+    padding-top: 50px;
+}
+
+.adminbar {
+    background: #1c2836;
+    box-shadow: inset 0 -2px 1px rgba(0,0,0,.05);
+    min-height: 50px;
+    padding: 0 15px;
+}
+
+.adminbar__list--children {
+    box-shadow: 0 1px 7px rgba(0,0,0,.175);
+    padding: 10px 0;
+}
+
+.adminbar__list-item {
+    height: 50px;
+    position: relative;
+}
+
+.adminbar__list-item--active,
+.adminbar__list-item:hover {
+    background: transparent;
+}
+
+.adminbar__button:hover:after,
+.adminbar__list-item--active:after,
+.adminbar__list-item:hover:after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 6px 7px 6px;
+    border-color: transparent transparent #fff transparent;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    margin-left: 6px;
+    z-index: 99;
+}
+
+.adminbar__form,
+.adminbar__button,
+.adminbar__link,
+.adminbar__link:visited,
+.adminbar__text {
+    background: transparent;
+    border: 0;
+    color: rgba(255,255,255,.7);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    height: 50px;
+    line-height: 50px;
+    text-decoration: none;
+}
+
+.adminbar__list-item--child .adminbar__button,
+.adminbar__link--child,
+.adminbar__link--child:visited,
+.adminbar__text--child {
+    font-size: 14px;
+}
+
+.adminbar__button:focus,
+.adminbar__button:hover,
+.adminbar__link:focus,
+.adminbar__link:hover {
+    color: #add8e6;
+    text-decoration: none;
+}
+
+.adminbar__list-item--child .adminbar__button,
+.adminbar__list-item--child,
+.adminbar__link--child,
+.adminbar__link--child:visited,
+.adminbar__link--child:focus,
+.adminbar__link--child:hover,
+.adminbar__text--child {
+    color: #354b60 !important;
+    height: 35px;
+    line-height: 35px;
+}
+
+.adminbar__list-item--child {
+    height: 35px;
+}
+
+.adminbar__list-item--child path {
+    fill: #97aab4;
+}
+
+.adminbar__list-item--child .adminbar__button:hover,
+.adminbar__list-item--child .adminbar__button:focus,
+.adminbar__link--child:focus,
+.adminbar__link--child:hover,
+.adminbar__list-item--active > .adminbar__link--child,
+.adminbar__list-item--active > .adminbar__link--child:visited {
+    background: #e2e9ef;
+}
+
+.adminbar__list-item--active > .adminbar__link,
+.adminbar__list-item--active > .adminbar__link:visited,
+.adminbar__list-item--active:hover > .adminbar__link,
+.adminbar__list-item--active:hover > .adminbar__link:visited {
+    color: #fff;
+}
+
+.adminbar__text {
+    color: rgba(255,255,255,.75);
+}
+
+.adminbar__logo {
+    float: left;
+    margin: 10px 15px 0 0;;
+    width: 30px;
+}
+
+.adminbar__logo-img {
+    height: auto;
+    max-width: 100%;
+}
+
+.adminbar__list-item--child .adminbar__button:after,
+.adminbar__list-item--child:after,
+.adminbar__list-item--item-logo:after,
+.adminbar__list-item--linkless:after {
+    display: none;
+}
+
+.adminbar__logo:focus,
+.adminbar__logo:hover {
+    filter: brightness(0) invert(1);
+}
+
+.adminbar__icon {
+    display: inline-block;
+    opacity: .7;
+    margin-bottom: -2px;
+    margin-right: 7px;
+    vertical-align: baseline;
+}
+
+.adminbar__link--child .adminbar__icon {
+    height: 14px;
+    width: 14px;
+}
+
+.adminbar__button:focus .adminbar__icon,
+.adminbar__link:focus .adminbar__icon,
+.adminbar__button:hover .adminbar__icon,
+.adminbar__list-item:not(.adminbar__list-item--linkless):hover .adminbar__icon,
+.adminbar__list-item--active .adminbar__icon {
+    opacity: 1;
+}
+
+.adminbar__list-item:not(.adminbar__list-item--child):not(.adminbar__list-item--active) > .adminbar__html > .adminbar__form > .adminbar__button:focus path,
+.adminbar__list-item:not(.adminbar__list-item--child):not(.adminbar__list-item--active):not(.adminbar__list-item--linkless) > .adminbar__link:focus > .adminbar__icon path,
+.adminbar__list-item:not(.adminbar__list-item--child):not(.adminbar__list-item--active):hover > .adminbar__html > .adminbar__form > .adminbar__button path,
+.adminbar__list-item:not(.adminbar__list-item--child):not(.adminbar__list-item--active):hover:not(.adminbar__list-item--linkless) > .adminbar__link > .adminbar__icon path,
+.adminbar__list-item:not(.adminbar__list-item--child):not(.adminbar__list-item--active):hover:not(.adminbar__list-item--linkless) > .adminbar__text > .adminbar__icon path {
+    fill: #add8e6;
+}
+
+.adminbar__avatar {
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin-bottom: -6px;
+    margin-right: 7px;
+}
+
+.adminbar__modal {
+    top: 50px;
+}
+
+.adminbar__modal--visible {
+    height: calc(100vh - 50px);
+}
+
+.adminbar__page-saved {
+    background: #ffd;
+    border-bottom: 1px solid #f0f3f7;
+    color: #354b60;
+    font-size: 18px;
+    height: 60px;
+    line-height: 32px;
+    padding: 15px;
+    position: absolute;
+}

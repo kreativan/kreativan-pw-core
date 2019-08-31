@@ -1,0 +1,142 @@
+html {
+    padding-top: 40px;
+}
+
+.adminbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    left: 0;
+    margin: 0;
+    min-height: 40px;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 999;
+}
+
+.adminbar__list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+}
+
+.adminbar__list--right {
+    float: right;
+}
+
+.adminbar__list--children {
+    background: #fff;
+    display: none;
+    min-width: 200px;
+    position: absolute;
+    z-index: 999;
+}
+
+.adminbar__list-item--has-children:focus-within .adminbar__list--children,
+.adminbar__list-item--has-children:hover .adminbar__list--children {
+    display: block;
+}
+
+.adminbar__list-item {
+    display: inline-block;
+    height: 40px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.adminbar__list-item--child {
+    display: block;
+    height: 30px;
+}
+
+.adminbar__form,
+.adminbar__button,
+.adminbar__html,
+.adminbar__link,
+.adminbar__text {
+    border: 0;
+    background: transparent;
+    display: inline-block;
+    font-size: 1em;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+    padding: 0 15px;
+}
+
+.adminbar__html,
+.adminbar__form {
+    padding: 0;
+}
+
+.adminbar__button {
+    cursor: pointer;
+}
+
+.adminbar__list-item--child .adminbar__form,
+.adminbar__list-item--child .adminbar__button {
+    display: block;
+    text-align: left;
+    width: 100%;
+}
+
+.adminbar__html--child,
+.adminbar__link--child,
+.adminbar__text--child {
+    color: #333;
+    display: block;
+}
+
+.adminbar__modal {
+    background: white;
+    height: 0;
+    max-height: calc(100vh - 40px);
+    opacity: 0;
+    overflow: hidden;
+    position: fixed;
+    top: 40px;
+    transition: height .25s ease-in-out, opacity .1s;
+    width: 100vw;
+    z-index: 998;
+}
+
+.adminbar__modal--visible {
+    height: calc(100vh - 40px);
+    opacity: 1;
+}
+
+.adminbar__modal--hidden {
+    border: 0;
+}
+
+.adminbar__modal--loading {
+    background: white url(loading.gif) center center no-repeat;
+}
+
+.adminbar__iframe {
+    height: 100%;
+    width: 100%;
+}
+
+.adminbar__page-saved {
+    background: white;
+    color: #333;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-bottom: 1px solid #cecece;
+    transition: all .25s;
+}
+
+.adminbar__page-saved--hidden {
+    top: -40px;
+    opacity: 0;
+}

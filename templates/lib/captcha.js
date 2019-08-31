@@ -9,7 +9,7 @@ function numbCaptcha() {
 
     captchaField.addEventListener('keyup', function(e) {
 
-        var submitButton = document.getElementById("button-submit");
+        var submitButton = document.querySelector(".captcha-button");
 
         if(this.value === captchaAnswer) {
             submitButton.removeAttribute("disabled");
@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', numbCaptcha, false);
  *
  */
 function recaptchaCallback() {
-    var submitButton = document.getElementById("button-submit");
+    var submitButton = document.querySelector(".captcha-button");
     submitButton.removeAttribute("disabled");
 };
 
 function recaptchaExpired() {
-    var submitButton = document.getElementById("button-submit");
+    var submitButton = document.querySelector(".captcha-button");
     submitButton.setAttribute("disabled", "disabled");
 };

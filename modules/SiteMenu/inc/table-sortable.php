@@ -52,16 +52,18 @@
 
                 <td class="uk-text-muted uk-text-small">
                     <?php
-                        if($item->link_block->link_type == '2' && !empty($item->link_block->select_page)) {
+                        if($item->link_block->link_type == '3' && !empty($item->link_block->select_page)) {
                             $page_link = $this->pages->get("id={$item->link_block->select_page}");
-                            if($page_link->parent->id == "1") {
+                            if($page_link->parent->id == "3") {
                                 echo "/{$page_link->name}/";
                             } else {
                                 echo "/{$page_link->parent->name}/{$page_link->name}/";
                             }
+                        } else {
+                            echo "-";
                         }
                     ?>
-                    <?= ($item->link_block->link_type == "1") ? "<em>{$item->link_block->link}</em>" : ""; ?>
+                    <?= ($item->link_block->link_type == "2") ? "<em>{$item->link_block->link}</em>" : ""; ?>
                 </td>
 
                 <td class="uk-text-center uk-text-muted uk-visible@m">

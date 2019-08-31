@@ -28,7 +28,7 @@ function getLinkOptions($menu) {
     if ($link_type == "3" && !empty($page_link)) {
         $p = wire("pages")->get("id=$page_link");
         $href = $p->url;
-        $class .= ($p->id == wire("page")->id || $p->id == wire("page")->rootParent->id) ? "uk-active uk-open" : "";
+        $class .= ($p->id == wire("page")->id) ? "uk-active uk-open" : "";
     } else {
         $href = $link;
         $attr .= ($link_attr[1]) ? " target='_blank'" : "";
@@ -178,7 +178,7 @@ function renderNavbarMenu($navbar, $home = true) {
 /**
  *  Render Full Mobile Menu
  *  @param PageArray $mobile_menu  eg: $page->children();
- *  @param string $align 
+ *  @param string $align
  *  @param bool $v_align
  *  @param bool $home show home link
  */
@@ -187,7 +187,7 @@ function renderMobileMenu($mobile_menu, $align = "center", $v_align = true, $hom
     $v_align = $v_align == true ? "uk-margin-auto-vertical" : "";
 
     // Start
-    $html = "<ul class='uk-nav uk-nav-primary uk-nav-$align $v_align' uk-nav>";
+    $html = "<ul class='uk-nav uk-nav-primary uk-nav-parent-icon uk-nav-$align $v_align' uk-nav>";
 
     // Home link
     if($home == true) {
